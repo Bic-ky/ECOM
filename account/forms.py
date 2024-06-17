@@ -31,8 +31,6 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['profile_picture', 'address', 'country','city']
 
-
-
 class UserInfoForm(forms.ModelForm):
     class Meta:
         model = User

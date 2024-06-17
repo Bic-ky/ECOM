@@ -19,7 +19,11 @@ from django.template.defaultfilters import slugify
 # from orders.models import Order
 import datetime
 
-
+@login_required(login_url='login')
+def myAccount(request):
+    user = request.user
+    redirectUrl = detectUser(user)
+    return redirect(redirectUrl)
 # Restrict the vendor from accessing the customer page
 def check_role_vendor(user):
     if user.role == 1:
@@ -113,11 +117,7 @@ def logout(request):
     return redirect('login')
 
 
-@login_required(login_url='login')
-def myAccount(request):
-    user = request.user
-    redirectUrl = detectUser(user)
-    return redirect(redirectUrl)
+
 
 
 # @login_required(login_url='login')
