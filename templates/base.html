@@ -55,7 +55,7 @@
                                 <ul>
                                     <li class="text-danger"><a href="">Home</a></li>
                                     <li class="menu-icon"><a href="#">About</a></li>            
-                                    <li class="menu-icon"><a href="">Shop</a></li>
+                                    <li class="menu-icon"><a href="{% url "shop" %}">Shop</a></li>
                                     <li class="menu-icon"><a href="">Contact</a></li>
                                     <li>
                                          {% if user.is_authenticated %}
@@ -75,8 +75,6 @@
                     </div>
                  
                 </div>
-               
-                
 
                 <div class="ltn__header-options ltn__header-options-2 ">
                         <!-- header-search-1 -->
@@ -101,12 +99,6 @@
                             <ul>
                                 <li>
                                     <a href="#"><i class="icon-user"></i></a>
-                                    <ul>
-                                        <li><a href="login.html">Sign in</a></li>
-                                        <li><a href="register.html">Register</a></li>
-                                        <li><a href="account.html">My Account</a></li>
-                                        <li><a href="wishlist.html">Wishlist</a></li>
-                                    </ul>
                                 </li>
                             </ul>
                         </div>

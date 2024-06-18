@@ -24,6 +24,7 @@ class Category(models.Model):
         return self.category_name
 
 
+
 class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='fooditems')
