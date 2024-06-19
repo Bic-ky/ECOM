@@ -5,25 +5,37 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.http import urlsafe_base64_decode
 
+from shop.models import Product
 from vendor.forms import VendorForm
 # from vendor.forms import VendorForm
-from .forms import UserForm
+from .forms import  UserForm
+from django.contrib.auth import authenticate, login as auth_login
+
 from .models import User, UserProfile
+
 from django.contrib import messages, auth
 from .utils import detectUser, send_verification_email
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from django.core.exceptions import PermissionDenied
 from vendor.models import Vendor
-from django.template.defaultfilters import slugify
 from orders.models import Order
 import datetime
 
-@login_required(login_url='login')
 def myAccount(request):
     user = request.user
-    redirectUrl = detectUser(user)
-    return redirect(redirectUrl)
+    if user.is_authenticated:
+        redirect_url = detectUser(user)
+        if redirect_url:
+            return redirect(redirect_url)
+        else:
+            messages.error(request, 'Unable to determine dashboard for the user.')
+            return redirect('account:login')
+    else:
+        messages.error(request, 'You need to log in to access your account.')
+        return redirect('account:login')
+    
+
 # Restrict the vendor from accessing the customer page
 def check_role_vendor(user):
     if user.role == 1:
@@ -47,7 +59,6 @@ def registerUser(request):
     elif request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
-
             # Create the user using create_user method
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -57,10 +68,6 @@ def registerUser(request):
             user.role = User.CUSTOMER
             user.save()
 
-            # Send verification email
-            mail_subject = 'Please activate your account'
-            email_template = 'account/emails/account_verification_email.html'
-            send_verification_email(request, user, mail_subject, email_template)
             messages.success(request, 'Your account has been registered sucessfully!')
             return redirect('registerUser')
         else:
@@ -72,6 +79,7 @@ def registerUser(request):
         'form': form,
     }
     return render(request, 'account/registerUser.html', context)
+
 
 
 def activate(request, uidb64, token):
@@ -93,15 +101,11 @@ def activate(request, uidb64, token):
         
 
 def login(request):
-    if request.user.is_authenticated:
-        messages.warning(request, 'You are already logged in!')
-        return redirect('myAccount')
-    elif request.method == 'POST':
+    if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-
         user = auth.authenticate(email=email, password=password)
-
+        print(user)
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are now logged in.')
@@ -111,6 +115,7 @@ def login(request):
             return redirect('login')
     return render(request, 'account/login.html')
 
+
 def logout(request):
     auth.logout(request)
     messages.info(request, 'You are logged out.')
@@ -119,18 +124,14 @@ def logout(request):
 
 
 
-
-@login_required(login_url='login')
-@user_passes_test(check_role_customer)
 def custDashboard(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True)
-    recent_orders = orders[:5]
+
+    product = Product.objects.all()
+
     context = {
-        'orders': orders,
-        'orders_count': orders.count(),
-        'recent_orders': recent_orders,
+        "product" : product 
     }
-    return render(request, 'account/custDashboard.html', context)
+    return render(request, 'account/custDashboard.html' , context)
 
 
 @login_required(login_url='login')

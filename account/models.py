@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.related import ForeignKey, OneToOneField
@@ -7,7 +8,6 @@ class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, email, password=None):
         if not email:
             raise ValueError('User must have an email address')
-
         user = self.model(
             email = self.normalize_email(email),
             first_name = first_name,
@@ -43,6 +43,7 @@ class User(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=12, blank=True)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True)
@@ -90,6 +91,7 @@ class UserProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return self.user.email
