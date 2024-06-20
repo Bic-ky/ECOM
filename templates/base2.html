@@ -112,16 +112,19 @@
                                 <a href="" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
                             </li>
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-account"></i><span>Profile</span></a>
+                                <a href="" class="waves-effect"><i class="mdi mdi-plus"></i><span>Add Product</span></a>
+                            </li>
+                            <li>
+                                <a href="{% url "cprofile" %}" class="waves-effect"><i class="mdi mdi-account"></i><span>Profile</span></a>
                             </li>
                             <li>
                                 <a href="" class="waves-effect"><i class="mdi mdi-cart"></i><span>Orders</span></a>
                             </li>
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-lock-reset"></i><span>Change Password</span></a>
+                                <a href="{% url 'user_change_password' %}" class="waves-effect"><i class="mdi mdi-lock-reset"></i><span>Change Password</span></a>
                             </li>
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-logout"></i><span>Logout</span></a>
+                                <a href="{% url "logout" %}" class="waves-effect"><i class="mdi mdi-logout"></i><span>Logout</span></a>
                             </li>
                             
                             {% elif user.role == user.VENDOR %}

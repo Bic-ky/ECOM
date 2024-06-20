@@ -1,7 +1,7 @@
 from django import forms
 from .models import User, UserProfile
 from .validators import allow_only_images_validator
-
+from django.contrib.auth.forms import PasswordChangeForm
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -21,20 +21,19 @@ class UserForm(forms.ModelForm):
             )
 
 
-class UserProfileForm(forms.ModelForm):
-    address = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Start typing...', 'required': 'required'}))
-    profile_picture = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}), validators=[allow_only_images_validator])
-    cover_photo = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}), validators=[allow_only_images_validator])
-    
-    # latitude = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-    # longitude = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-    class Meta:
-        model = UserProfile
-        fields = ['profile_picture', 'cover_photo', 'address', 'country', 'state', 'city']
-
-
-
 class UserInfoForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'phone_number']
+
+
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add form control attributes to the fields
+        self.fields['old_password'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
+        self.fields['new_password1'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
+        self.fields['new_password2'].widget = forms.PasswordInput(attrs={'class': 'form-control'})

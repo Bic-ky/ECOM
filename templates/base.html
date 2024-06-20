@@ -62,12 +62,21 @@
                                         <a href="{% url 'logout' %}">Logout</a></li>
                                         <li style="position: absolute; right: 0;">
                                             <a href="{% url 'myAccount' %}">
-                                                <img src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" width="40" height="40" alt="Profile Picture"><span>My Account</span>
+                                                <img src="{{user.userprofile.profile_picture.url}}" width="40" height="40" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-right: 10px;"><span>My Account</span>
                                             </a>
-                                        </li>
+
+                                        
                                         {% else %}
                                         <a href="{% url 'login' %}">Login</a></li>
                                         {% endif %}
+                                    </li>
+                                    <li>
+                                        <a href="" title="Shopping Cart" style="margin-left: 10px;">
+                                            <span class="utilize-btn-icon">
+                                                <i class="fas fa-shopping-cart" ></i>
+                                                <span class="badge badge-warning" id="cart_counter" style="border-radius: 50px; position: relative; bottom: 10px; left: -5px;">{{ cart_count }}</span>
+                                            </span>
+                                        </a>
                                     </li>
                                 </ul>
                         </nav>
@@ -77,42 +86,10 @@
                 </div>
 
                 <div class="ltn__header-options ltn__header-options-2 ">
-                        <!-- header-search-1 -->
-                        <div class="header-search-wrap">
-                            <div class="header-search-1">
-                                <div class="search-icon">
-                                    <i class="icon-search for-search-show"></i>
-                                    <i class="icon-cancel  for-search-close"></i>
-                                </div>
-                            </div>
-                            <div class="header-search-1-form">
-                                <form id="#" method="get"  action="#">
-                                    <input type="text" name="search" value="" placeholder="Search here..."/>
-                                    <button type="submit">
-                                        <span><i class="icon-search"></i></span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <!-- user-menu -->
-                        <div class="ltn__drop-menu user-menu">
-                            <ul>
-                                <li>
-                                    <a href="#"><i class="icon-user"></i></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- mini-cart -->
-                        <div class="mini-cart-icon">
-                            <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle">
-                                <i class="icon-shopping-cart"></i>
-                                <sup>2</sup>
-                            </a>
-                        </div>
                         <!-- mini-cart -->
                         {% if not user.is_authenticated %}                                                             
-                <a class="btn theme-btn-1 rounded-pill" href="{% url 'registerUser' %}" style="margin-top: 10px; margin-bottom: 10px; padding: 10px 5px; border-radius: 10px; width: 150px;">Register</a>
-                {% endif %} 
+                            <a class="btn theme-btn-1 rounded-pill" href="{% url 'registerUser' %}" style="margin-top: 10px; margin-bottom: 10px; padding: 10px 5px; border-radius: 10px; width: 150px;">Register</a>
+                            {% endif %} 
                     </div>
                    
                     <!-- Mobile Menu Button -->

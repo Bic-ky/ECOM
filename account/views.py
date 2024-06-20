@@ -8,16 +8,16 @@ from django.utils.http import urlsafe_base64_decode
 from shop.models import Product
 from vendor.forms import VendorForm
 # from vendor.forms import VendorForm
-from .forms import  UserForm
+from .forms import  UserForm , CustomPasswordChangeForm
 from django.contrib.auth import authenticate, login as auth_login
-
+from django.contrib.auth import update_session_auth_hash
 from .models import User, UserProfile
 
 from django.contrib import messages, auth
 from .utils import detectUser, send_verification_email
 from django.contrib.auth.decorators import login_required, user_passes_test
-
 from django.core.exceptions import PermissionDenied
+
 from vendor.models import Vendor
 from orders.models import Order
 import datetime
@@ -216,3 +216,20 @@ def reset_password(request):
             messages.error(request, 'Password do not match!')
             return redirect('reset_password')
     return render(request, 'account/reset_password.html')
+
+
+@login_required
+def user_change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Update session
+            messages.success(
+                request, 'Your password was successfully updated!')
+            logout(request)  # Log out the user
+            return redirect('account:custDashboard')
+    else:
+        # Pass user=request.user to initialize the form with the user's data
+        form = CustomPasswordChangeForm(user=request.user)
+    return render(request, 'account/change_password.html', {'form': form})
