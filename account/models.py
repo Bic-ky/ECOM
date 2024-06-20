@@ -5,7 +5,7 @@ from django.db.models.fields.related import ForeignKey, OneToOneField
 
 # Create your models here.
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, email, password=None):
+    def create_user(self, first_name, last_name,username, email, password=None):
         if not email:
             raise ValueError('User must have an email address')
         user = self.model(
@@ -43,7 +43,7 @@ class User(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=50, unique=True , blank=True)
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=12, blank=True)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True)
