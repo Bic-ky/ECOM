@@ -4,7 +4,7 @@ $(document).ready(function() {
     $('.add_to_cart').on('click', function(e) {
         e.preventDefault();
 
-        project_id = $(this).attr('data-id');
+        product_id = $(this).attr('data-id');
         url = $(this).attr('data-url');
 
         $.ajax({
@@ -20,14 +20,8 @@ $(document).ready(function() {
                     swal(response.message, '', 'error');
                 } else if (response.status == 'Success') {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
-                    $('#qty-' + project_id).html(response.qty);
+                    $('#qty-' + product_id).html(response.qty);
 
-                    // subtotal, tax, and grand total
-                    applyCartAmounts(
-                        response.cart_amount['subtotal'],
-                        response.cart_amount['tax_dict'],
-                        response.cart_amount['grand_total']
-                    );
                 }
             },
             error: function(xhr, status, error) {
@@ -39,14 +33,7 @@ $(document).ready(function() {
                         icon: 'warning',
                         button: 'OK'
                     });
-                } else if (response.status == 'Failed' && response.message == 'Quantity exceeds the available share') {
-                    swal({
-                        title: 'Quantity Exceeds Available Share',
-                        text: 'The available share limit for this project has been reached.',
-                        icon: 'warning',
-                        button: 'OK'
-                    });
-                } else {
+                }  else {
                     alert('Error: ' + response.message);
                 }
             }
@@ -64,7 +51,7 @@ $(document).ready(function() {
     $('.decrease_cart').on('click', function(e) {
         e.preventDefault();
 
-        project_id = $(this).attr('data-id');
+        product_id = $(this).attr('data-id');
         url = $(this).attr('data-url');
         cart_id = $(this).attr('id');
 
@@ -81,13 +68,8 @@ $(document).ready(function() {
                     swal(response.message, '', 'error')
                 } else {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
-                    $('#qty-' + project_id).html(response.qty);
+                    $('#qty-' + product_id).html(response.qty);
 
-                    applyCartAmounts(
-                        response.cart_amount['subtotal'],
-                        response.cart_amount['tax_dict'],
-                        response.cart_amount['grand_total']
-                    );
 
                     if (window.location.pathname == '/cart/') {
                         removeCartItem(response.qty, cart_id);
@@ -116,12 +98,6 @@ $(document).ready(function() {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
                     swal(response.status, response.message, "success")
 
-                    applyCartAmounts(
-                        response.cart_amount['subtotal'],
-                        response.cart_amount['tax_dict'],
-                        response.cart_amount['grand_total']
-                    );
-
                     removeCartItem(0, cart_id);
                     checkEmptyCart();
                 }
@@ -147,19 +123,12 @@ $(document).ready(function() {
 
     // apply cart amounts
     function applyCartAmounts(subtotal, tax_dict, grand_total) {
-        if (window.location.pathname === '/ecom/cart/') {
+        if (window.location.pathname === '/shop/cart/') {
             // Update the cart amounts on the '/ecom/cart/' page
             $('#subtotal').html(subtotal);
             $('#total').html(grand_total);
             
             console.log(tax_dict)
-            for (key1 in tax_dict) {
-                console.log(tax_dict[key1])
-                for (key2 in tax_dict[key1]) {
-                    // console.log(tax_dict[key1][key2])
-                    $('#tax-' + key1).html(tax_dict[key1][key2]);
-                }
-            }
         }
     }
 });
@@ -282,7 +251,7 @@ function onPlaceChanged (){
         // Create the form data object
         var formData = new FormData();
         formData.append('csrfmiddlewaretoken', csrfToken);
-        formData.append('project_id', projectId);
+        formData.append('product_id', projectId);
         formData.append('status', status);
   
         // Perform the AJAX request

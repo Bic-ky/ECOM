@@ -41,11 +41,12 @@
                         <div class="tab-pane fade active show" id="liton_product_grid">
                             <div class="ltn__product-tab-content-inner ltn__product-grid-view">
                                 <div class="row">
+                                    {% for prod in products  %}
                                     <!-- ltn__product-item -->
                                     <div class="col-xl-4 col-sm-6 col-6">
                                         <div class="ltn__product-item ltn__product-item-3 text-center">
                                             <div class="product-img">
-                                                <a href="product-details.html"><img src="{% static "img/nicee2.png" %}" alt="#"></a>
+                                                <a href="product-details.html"><img src="{{ prod.image.url }}" alt="#"></a>
                                                 <div class="product-hover-action">
                                                     <ul>
                                                         <li>
@@ -66,14 +67,14 @@
                                                 </div>
                                             </div>
                                             <div class="product-info">
-                                                <h2 class="product-title"><a href="product-details.html">Wheel Bearing Retainer</a></h2>
+                                                <h1 class="product-title"><a href="{% url 'product_detail' id=prod.id %}"> {{prod.product_title}} </a> </h1>
                                                 <div class="product-price">
-                                                    <span>$149.00</span>
-                                                    <del>$162.00</del>
+                                                    <span>Price : ${{prod.price}}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    {% endfor %}
                                     <!-- ltn__product-item -->
                                     <div class="col-xl-4 col-sm-6 col-6">
                                         <div class="ltn__product-item ltn__product-item-3 text-center">
@@ -145,15 +146,51 @@
                         </div>
                     </div>
                     <div class="ltn__pagination-area text-center">
-                        <div class="ltn__pagination">
+                        <div class="ltn__pagination mb-40">
                             <ul>
-                                <li><a href="#"><i class="fas fa-angle-double-left"></i></a></li>
-                                <li><a href="#">1</a></li>
-                                <li class="active"><a href="#">2</a></li>
-                                <li><a href="#">3</a></li>
-                                <li><a href="#">...</a></li>
-                                <li><a href="#">10</a></li>
-                                <li><a href="#"><i class="fas fa-angle-double-right"></i></a></li>
+                                {% if project_page.has_previous %}
+                                <li>
+                                    <a href="?page=1"><i class="fas fa-angle-double-left"></i></a>
+                                </li>
+                                <li>
+                                    <a href="?page={{ project_page.previous_page_number }}"><i class="fas fa-angle-left"></i></a>
+                                </li>
+                                {% else %}
+                                <li class="disabled">
+                                    <a><i class="fas fa-angle-double-left"></i></a>
+                                </li>
+                                <li class="disabled">
+                                    <a><i class="fas fa-angle-left"></i></a>
+                                </li>
+                                {% endif %}
+    
+                                {% for num in project_page.paginator.page_range %}
+                                {% if project_page.number == num %}
+                                <li class="active">
+                                    <a>{{ num }}</a>
+                                </li>
+                                {% else %}
+                                <li>
+                                    <a href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+    
+                                {% if project_page.has_next %}
+                                <li>
+                                    <a href="?page={{ project_page.next_page_number }}"><i class="fas fa-angle-right"></i></a>
+                                </li>
+                                <li>
+                                    <a href="?page={{ project_page.paginator.num_pages }}"><i class="fas fa-angle-double-right"></i></a>
+                                </li>
+                                {% else %}
+                                <li class="disabled">
+                                    <a><i class="fas fa-angle-right"></i></a>
+                                </li>
+                                <li class="disabled">
+                                    <a><i class="fas fa-angle-double-right"></i></a>
+                                </li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>

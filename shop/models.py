@@ -6,9 +6,7 @@ from django.core.exceptions import ValidationError
 
 
 class Category(models.Model):
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category_name = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=250, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -46,25 +44,12 @@ class Product(models.Model):
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(blank=True , null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         user = self.user
-        if not user.is_verified:
-            raise ValidationError("User must be verified to invest")
-        
-        max_shares_per_user = self.project.max_shares_per_user
-        total_shares = self.project.total_no_shares
-
-        # Check if the quantity exceeds the maximum shares per user
-        if self.quantity > max_shares_per_user:
-            raise ValidationError("Quantity exceeds the maximum shares per user")
-
-        # Check if the quantity exceeds the available shares
-        if self.quantity > total_shares:
-            raise ValidationError("No more shares available")
 
         existing_cart = Cart.objects.filter(user=user).exclude(pk=self.pk).first()
         if existing_cart:
