@@ -96,7 +96,6 @@
             <div class="vertical-menu">
                 <div data-simplebar class="h-100">
                     <div class="navbar-brand-box">
-                        {% comment %} <a href="{% if user.is_authenticated %}{% if user.role == user.ADMIN %}{% url 'account:admindashboard' %}{% else %}{% url 'account:userdashboard' %}{% endif %}{% else %}#{% endif %}" class="logo"> {% endcomment %}
                             <a href="{% url "index" %}" >
                             <img  src="{% static 'img/logo.png' %}" height="60" width="130" alt="Dashboard Logo">
                         </a>
@@ -112,7 +111,7 @@
                                 <a href="" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
                             </li>
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-plus"></i><span>Add Product</span></a>
+                                <a href="{% url "add_product" %}" class="waves-effect"><i class="mdi mdi-plus"></i><span>Add Product</span></a>
                             </li>
                             <li>
                                 <a href="{% url "cprofile" %}" class="waves-effect"><i class="mdi mdi-account"></i><span>Profile</span></a>

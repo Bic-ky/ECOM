@@ -66,9 +66,6 @@ class Order(models.Model):
     def name(self):
         return f'{self.first_name} {self.last_name}'
 
-    
-    def __str__(self):
-        return f"Order {self.order_number} - Placed to: {self.order_placed_to()}"
 
     def get_total_by_vendor(self, vendor):
         subtotal = 0

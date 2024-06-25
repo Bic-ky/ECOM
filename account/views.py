@@ -6,7 +6,6 @@ from django.shortcuts import redirect, render
 from django.utils.http import urlsafe_base64_decode
 
 from shop.models import Product
-from vendor.forms import VendorForm
 # from vendor.forms import VendorForm
 from .forms import  UserForm , CustomPasswordChangeForm
 from django.contrib.auth import authenticate, login as auth_login
@@ -22,6 +21,7 @@ from vendor.models import Vendor
 from orders.models import Order
 import datetime
 
+@login_required(login_url='account:login')
 def myAccount(request):
     user = request.user
     if user.is_authenticated:
@@ -67,6 +67,7 @@ def registerUser(request):
             password = form.cleaned_data['password']
             user = User.objects.create_user(first_name=first_name, last_name=last_name,username=username, email=email, password=password)
             user.role = User.CUSTOMER
+            user.is_active = True
             user.save()
 
             messages.success(request, 'Your account has been registered sucessfully!')
@@ -80,6 +81,37 @@ def registerUser(request):
         'form': form,
     }
     return render(request, 'account/registerUser.html', context)
+
+
+def registerVendor(request):
+    if request.user.is_authenticated:
+        messages.warning(request, 'You are already logged in!')
+        return redirect('myAccount')
+    elif request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            # Create the user using create_user method
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = User.objects.create_user(first_name=first_name, last_name=last_name,username=username, email=email, password=password)
+            user.role = User.VENDOR
+            user.is_active = True
+            user.save()
+
+            messages.success(request, 'Your account has been registered sucessfully!')
+            return redirect('login')
+        else:
+            print('invalid form')
+            print(form.errors)
+    else:
+        form = UserForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'account/registerVendor.html', context)
 
 
 
@@ -102,12 +134,16 @@ def activate(request, uidb64, token):
         
 
 def login(request):
+    if request.user.is_authenticated:
+        messages.warning(request, 'You are already logged in!')
+        return redirect('myAccount')
+    
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        user = auth.authenticate(email=email, password=password)
+        user = authenticate(request, email=email, password=password)
         print(user)
-        if user is not None:
+        if user is not None and user.is_active:
             auth.login(request, user)
             messages.success(request, 'You are now logged in.')
             return redirect('myAccount')
@@ -135,33 +171,8 @@ def custDashboard(request):
     return render(request, 'account/custDashboard.html' , context)
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    vendor = Vendor.objects.get(user=request.user)
-    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by('created_at')
-    recent_orders = orders[:10]
-
-    # current month's revenue
-    current_month = datetime.datetime.now().month
-    current_month_orders = orders.filter(vendors__in=[vendor.id], created_at__month=current_month)
-    current_month_revenue = 0
-    for i in current_month_orders:
-        current_month_revenue += i.get_total_by_vendor()['grand_total']
-    
-
-    # total revenue
-    total_revenue = 0
-    for i in orders:
-        total_revenue += i.get_total_by_vendor()['grand_total']
-    context = {
-        'orders': orders,
-        'orders_count': orders.count(),
-        'recent_orders': recent_orders,
-        'total_revenue': total_revenue,
-        'current_month_revenue': current_month_revenue,
-    }
-    return render(request, 'account/vendorDashboard.html', context)
+    return render(request, 'account/vendorDashboard.html')
 
 
 def forgot_password(request):

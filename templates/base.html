@@ -25,7 +25,9 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <!-- Include the PayPal JavaScript SDK -->
-        <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+        {% comment %} <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script> {% endcomment %}
+        <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&components=buttons&enable-funding=venmo,paylater" data-sdk-integration-source="integrationbuilder_sc"></script>
+    <script src="{% static "js/paymentapp.js" %}"></script>
     </head>
     
 
@@ -74,14 +76,16 @@
                                         <a href="{% url 'login' %}">Login</a></li>
                                         {% endif %}
                                     </li>
+                                    {% if user.is_authenticated %}
                                     <li>
-                                        <a href="" title="Shopping Cart" style="margin-left: 10px;">
+                                        <a href="{% url "cart" %}" title="Shopping Cart" style="margin-left: 10px;">
                                             <span class="utilize-btn-icon">
                                                 <i class="fas fa-shopping-cart" ></i>
                                                 <span class="badge badge-warning" id="cart_counter" style="border-radius: 50px; position: relative; bottom: 10px; left: -5px;">{{ cart_count }}</span>
                                             </span>
                                         </a>
                                     </li>
+                                    {% endif %}
                                 </ul>
                         </nav>
                         
@@ -217,7 +221,7 @@
                 </div>
                 <div class="col-xl-2 col-md-6 col-sm-6 col-12">
                     <div class="footer-widget footer-menu-widget clearfix">
-                        <h4 class="footer-title">Company</h4>
+                        <h4 class="footer-title"><a href="{% url "registerVendor" %}">Register Vendor</a></h4>
                         <div class="footer-menu">
                             <ul>
                                 <li><a href="">About</a></li>

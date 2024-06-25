@@ -21,15 +21,16 @@ $(document).ready(function() {
                 } else if (response.status == 'Success') {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
                     $('#qty-' + product_id).html(response.qty);
+                    // Do not update the cart amount
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Error:', xhr.responseText);
                 var response = xhr.responseJSON;
-                if (response && response.status == 'Failed' && response.message == 'Maximum share limit reached for this project!') {
+                if (response && response.status == 'Failed' && response.message == 'Maximum limit reached for this product!') {
                     swal({
-                        title: 'Maximum Share Limit Reached',
-                        text: 'You have reached the maximum share limit for this project.',
+                        title: 'Maximum Limit Reached',
+                        text: 'You have reached the maximum limit for this product.',
                         icon: 'warning',
                         button: 'OK'
                     });
@@ -40,6 +41,41 @@ $(document).ready(function() {
         });
     });
 
+    // Decrease cart
+    $('.decrease_cart').on('click', function(e) {
+        e.preventDefault();
+
+        let product_id = $(this).attr('data-id');
+        let url = $(this).attr('data-url');
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response) {
+                console.log(response);
+                if (response.status == 'login_required') {
+                    swal(response.message, '', 'info').then(function() {
+                        window.location.href = '/account/login';
+                    });
+                } else if (response.status == 'Failed') {
+                    swal(response.message, '', 'error');
+                } else if (response.status == 'Success') {
+                    $('#cart_counter').html(response.cart_counter['cart_count']);
+                    $('#qty-' + product_id).html(response.qty);
+                    // Do not update the cart amount
+
+                    if (window.location.pathname == '/cart/') {
+                        removeCartItem(response.qty, product_id);
+                        checkEmptyCart();
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                var response = xhr.responseJSON;
+                alert('Error: ' + response.message);
+            }
+        });
+    });
 
 
     // DELETE CART ITEM

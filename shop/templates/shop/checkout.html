@@ -13,7 +13,7 @@
                         <div class="ltn__checkout-single-content mt-50">
                             <h4 class="title-2">Billing Details</h4>   
                             <div class="ltn__checkout-single-content-info">
-                                <form action="{% url 'place_order' %}" method="POST">
+                                <form id="checkout-form" action="{% url 'place_order' %}" method="POST">
                                     {% csrf_token %}
                                     <h6>Personal Information</h6>
                                     <div class="row">
@@ -102,15 +102,15 @@
                            
                             &emsp;
                             <label>
-                                <input type="radio" name="payment_method" value="Khalti">
-                                <img src="{% static 'ecom/img/icons/paymenta.png' %}" alt="Khalti" width="100">
+                                <input type="radio" name="payment_method" value="PayPal">
+                                <img src="{% static 'img/paypal.jpg' %}" alt="PayPal" width="100">
                             </label>
                         </div>
                         <div class="ltn__payment-note mt-30 mb-30">
                             <p>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.</p>
                         </div>
                         <span class="text-danger" id="payment-method-error"></span><br>
-                        <button onclick="return payMethodConfirm();" type="submit" class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Place order</button>
+                        <button onclick="return payMethodConfirm();" type="button" class="btn theme-btn-1 btn-effect-1 text-uppercase">Place order</button>
                     </div>
                 </div>
             </form>
@@ -138,7 +138,7 @@
                             {% for cart_item in cart_items %}
                             <tr>
                                 <td>Quantity</td>
-                                <td><span id="quantity"> {{ cart_item.quantity}} </span></td>
+                                <td><span id="quantity-{{ cart_item.project.id }}"> {{ cart_item.quantity}} </span></td>
                             </tr>
                             <tr>
                          {% endfor %}
@@ -159,26 +159,38 @@
         </div>
     </div>
     <!-- END -->
-    <script>
-        function payMethodConfirm(){
-            var payMethod = $("input[name='payment_method']:checked").val()
-            if(!payMethod){
-                $('#payment-method-error').html("Select Payment Method!");
-                return false;
-            }else{
-                var conf = confirm('You have selected '+payMethod+' as your preferred payment method.\nClick "OK" to continue.')
-                if(conf == true){
-                    return true;
-                }else{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function payMethodConfirm(){
+        var payMethod = $("input[name='payment_method']:checked").val();
+        if(!payMethod){
+            $('#payment-method-error').html("Select Payment Method!");
+            return false;
+        } else {
+            Swal.fire({
+                title: 'Confirm Payment Method',
+                text: 'You have selected ' + payMethod + ' as your preferred payment method.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Trigger form submission
+                    $('#checkout-form').submit();
+                } else {
+                    // User canceled the confirmation
                     return false;
                 }
-            }
-            
+            });
+            return false; // Prevent form submission until user confirms
         }
+    }
     
-        $('input[name=payment_method]').on('change', function(){
-            $('#payment-method-error').html("");
-        })
-    </script>
-    {% endblock content %}
+    $('input[name=payment_method]').on('change', function(){
+        $('#payment-method-error').html("");
+    });
+</script>
 
+{% endblock content %}

@@ -71,17 +71,27 @@ def product_detail(request , id):
 
 
 
-@login_required
-def cart(request):
-    try:
-        cart_items = Cart.objects.filter(user=request.user)
-        context = {'cart_items': cart_items}
-        return render(request, 'shop/cart.html', context)
-    except Exception as e:
-        logger.error(f'Error in cart view: {str(e)}')
-        return render(request, 'shop/cart.html', {'error': 'An unexpected error occurred'})
 
 @login_required
+def get_cart_details(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    product_quantities = {item.project.id: item.quantity for item in cart_items}
+    
+    return JsonResponse({
+        'product_quantities': product_quantities,
+    })
+
+def cart(request):
+    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+    cart_count = cart_items.count()
+    context = {
+        'cart_items': cart_items,
+        'cart_count': cart_count,
+    }
+    return render(request, 'shop/cart.html', context)
+
+
+
 def add_to_cart(request, product_id):
     logger.info(f'add_to_cart called with product_id: {product_id}')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -112,37 +122,41 @@ def add_to_cart(request, product_id):
     else:
         return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
 
-@login_required
+
 def decrease_cart(request, product_id):
     logger.info(f'decrease_cart called with product_id: {product_id}')
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        try:
-            product = get_object_or_404(Product, id=product_id)
-            cart_item = get_object_or_404(Cart, user=request.user, project=product)
-            if cart_item.quantity > 1:
-                cart_item.quantity -= 1
-                cart_item.save()
-            else:
-                cart_item.delete()
-                cart_item.quantity = 0
-            logger.info(f'Cart updated successfully for product_id: {product_id}')
-            return JsonResponse({
-                'status': 'Success',
-                'cart_counter': get_cart_counter(request),
-                'qty': cart_item.quantity,
-                'cart_amount': get_cart_amounts(request)
-            })
-        except Cart.DoesNotExist:
-            logger.error(f'Cart item for product {product_id} does not exist.')
-            return JsonResponse({'status': 'Failed', 'message': 'You do not have this item in your cart!'})
-        except Product.DoesNotExist:
-            logger.error(f'Product with id {product_id} does not exist.')
-            return JsonResponse({'status': 'Failed', 'message': 'This product does not exist!'})
-        except Exception as e:
-            logger.error(f'Unexpected error in decrease_cart: {str(e)}')
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'})
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                product = get_object_or_404(Product, id=product_id)
+                cart_item = get_object_or_404(Cart, user=request.user, project=product)
+                if cart_item.quantity > 1:
+                    cart_item.quantity -= 1
+                    cart_item.save()
+                else:
+                    cart_item.delete()
+                    cart_item.quantity = 0  # Ensure the quantity is set to 0 for the response
+                logger.info(f'Cart updated successfully for product_id: {product_id}')
+                return JsonResponse({
+                    'status': 'Success',
+                    'cart_counter': get_cart_counter(request),
+                    'qty': cart_item.quantity,
+                    'cart_amount': get_cart_amounts(request)
+                })
+            except Cart.DoesNotExist:
+                logger.error(f'Cart item for product {product_id} does not exist.')
+                return JsonResponse({'status': 'Failed', 'message': 'You do not have this item in your cart!'})
+            except Product.DoesNotExist:
+                logger.error(f'Product with id {product_id} does not exist.')
+                return JsonResponse({'status': 'Failed', 'message': 'This product does not exist!'})
+            except Exception as e:
+                logger.error(f'Unexpected error in decrease_cart: {str(e)}')
+                return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'})
+        else:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
     else:
-        return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
+        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+
 
 @login_required
 def delete_cart(request, cart_id):

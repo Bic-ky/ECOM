@@ -55,12 +55,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "orders.request_object.RequestObjectMiddleware",
 ]
 
 
 ROOT_URLCONF = 'e_commerce.urls'
 
-AUTH_USER_MODEL = 'account.User'
 
 TEMPLATES = [
     {
@@ -117,6 +117,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'account.User'
 
 
 # Internationalization
