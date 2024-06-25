@@ -2,105 +2,80 @@
 {% block content %}
 {% load static %}
 
-
-    <!-- SHOPING CART AREA START -->
-    <div class="liton__shoping-cart-area mb-120 mt-120">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="shoping-cart-inner">
-                        <div class="table table-responsive">
-                            <table class="table">
-                                <thead class="col-xs-1 text-center">
-                                    <th class="cart-product-remove">Remove</th>
-                                    <th class="cart-product-image">Image</th>
-                                    <th class="cart-product-info">Product</th>
-                                    <th class="cart-product-price">Price</th>
-                                    <th class="cart-product-quantity">Quantity</th>
-                                </thead> 
-                                <tbody>
-                                    <tr class="col-xs-1 text-center">
-                                        <a>
-                                        <td class="cart-product-remove"><i class="fas fa-trash"><i/></td>
-                                        </a>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/1.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Brake Conversion Kit</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$149.00</td>
-                                        <td class="cart-product-quantity">
-                                                <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                        
-                                        </td>
-                                    </tr>
-                                    <tr class="col-xs-1 text-center">
-                                        <a>
-                                            <td class="cart-product-remove"><i class="fas fa-trash"><i/></td>
-                                            </a>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/2.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">OE Replica Wheels</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$85.00</td>
-                                        <td class="cart-product-quantity">
-                                            <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                    
-                                    </td>
-                                    </tr>
-                                    <tr class="col-xs-1 text-center">
-                                        <a>
-                                            <td class="cart-product-remove"><i class="fas fa-trash"><i/></td>
-                                            </a>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/3.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Wheel Bearing Retainer</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$75.00</td>
-                                        <td class="cart-product-quantity">
-                                            <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                    
-                                    </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="shoping-cart-total mt-50">
-                            <h4>Cart Totals</h4>
-                            <table class="table">
-                                <tbody>
+<!-- SHOPING CART AREA START -->
+<div class="liton__shoping-cart-area mb-120 mt-120">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="shoping-cart-inner">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <!-- Add more columns as needed -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if cart_items %}
+                                    {% for cart_item in cart_items %}
+                                        <tr>
+                                            <td class="cart-product-image"><img src="{{ cart_item.project.image.url }}" alt="Product Image"></td>
+                                            <td>{{ cart_item.project.product_title }}</td>
+                                            <td>$ {{ cart_item.project.price }}</td>
+                                            <td>{{ cart_item.quantity }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
-                                        <td>Cart Subtotal</td>
-                                        <td>$618.00</td>
+                                        <td colspan="4">
+                                            <p>No items in your cart.</p>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Shipping and Handing</td>
-                                        <td>$15.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Vat</td>
-                                        <td>$00.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Order Total</strong></td>
-                                        <td><strong>$633.00</strong></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="btn-wrapper text-right">
-                                <a href="{% url "checkout" %} "class="theme-btn-1 btn btn-effect-1">Proceed to checkout</a>
-                            </div>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="shoping-cart-total mt-50">
+                        <h4>Cart Totals</h4>
+                        <table class="table">
+                            <tbody>
+                                {% for key, value in tax_dict.items %}
+                                        {% for i, j in value.items %}
+                                            <tr>
+                                                <td>{{ key }} <small>({{ i }}%)</small></td>
+                                                <td>
+                                                    <span class="price ">
+                                                        <span class="currency">$ </span>
+                                                        <span id="tax-{{ key }}">{{ j }}</span>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                <tr>
+                                    <td>Cart Subtotal</td>
+                                    <td><span id="subtotal">$ {{ subtotal }}</span></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Order Total</strong></td>
+                                    <td><strong>$ <span id="total">{{ grand_total }}</span></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="btn-wrapper text-right">
+                            <a href="{% url 'checkout' %}" class="theme-btn-1 btn btn-effect-1">Proceed to checkout</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- SHOPING CART AREA END -->
+</div>
+<!-- SHOPING CART AREA END -->
 
-{% endblock content %}
+{% endblock %}

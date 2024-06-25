@@ -44,20 +44,12 @@ class Product(models.Model):
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(blank=True , null=True)
+    quantity = models.PositiveIntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         user = self.user
-
-        existing_cart = Cart.objects.filter(user=user).exclude(pk=self.pk).first()
-        if existing_cart:
-            raise ValidationError("Only one project is allowed per user in the cart.")
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return str(self.user)
