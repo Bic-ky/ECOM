@@ -1,7 +1,7 @@
 
 from django.shortcuts import get_object_or_404, redirect, render
 from customers.forms import UserProfileForm
-from orders.models import Order
+from orders.models import Order, ProductOrder
 from shop.models import Category, Product
 from vendor.forms import VendorForm
 from shop.forms import ProductItemForm
@@ -157,22 +157,25 @@ def my_orders(request):
     }
     return render(request, 'vendor/my_orders.html', context)
 
-# def order_detail(request, order_number):
-#     try:
-#         order = Order.objects.get(order_number=order_number, is_ordered=True)
-#         ordered_product = Orderedproduct.objects.filter(order=order, productitem__vendor=get_vendor(request))
 
-#         context = {
-#             'order': order,
-#             'ordered_product': ordered_product,
-#             'subtotal': order.get_total_by_vendor()['subtotal'],
-#             'tax_data': order.get_total_by_vendor()['tax_dict'],
-#             'grand_total': order.get_total_by_vendor()['grand_total'],
-#         }
-#     except:
-#         return redirect('vendor')
-#     return render(request, 'vendor/order_detail.html', context)
 
+def order_detail(request, order_number):
+    try:
+        order = get_object_or_404(Order, order_number=order_number)
+        ordered_product = ProductOrder.objects.filter(order=order)
+        print(ordered_product)
+        context = {
+            'order': order,
+            'ordered_product': ordered_product,
+            'subtotal':order.total - order.total_tax, # Assuming this method exists in your Order model
+            'tax_data': order.get_total_by_vendor(vendor=request.user)['tax_dict'],
+            'grand_total': order.get_total_by_vendor(vendor=request.user)['grand_total'],
+        }
+        
+        print(context)
+        return render(request, 'vendor/order_detail.html', context)
+    except Order.DoesNotExist:
+        return redirect('vendor')  # Redirect to vendor page if order does not exist
 
 # def my_orders(request):
 #     vendor = Vendor.objects.get(user=request.user)

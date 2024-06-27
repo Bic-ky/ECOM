@@ -90,6 +90,7 @@ class Order(models.Model):
                         tax += float(val[i][j])
 
         grand_total = subtotal + tax  # No need to convert to float again
+
         context = {
             'subtotal': subtotal,
             'tax_dict': tax_dict,

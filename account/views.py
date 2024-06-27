@@ -240,7 +240,11 @@ def user_change_password(request):
             messages.success(
                 request, 'Your password was successfully updated!')
             logout(request)  # Log out the user
-            return redirect('account:custDashboard')
+
+            if request.user.role == 'CUSTOMER':
+                return redirect('account:custDashboard')
+            elif request.user.role == 'VENDOR':
+                return redirect('account:vendorDashboard')
     else:
         # Pass user=request.user to initialize the form with the user's data
         form = CustomPasswordChangeForm(user=request.user)

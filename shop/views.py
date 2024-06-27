@@ -70,8 +70,6 @@ def product_detail(request , id):
     return render(request, "shop/prod_detail.html" , context)
 
 
-
-
 @login_required
 def get_cart_details(request):
     cart_items = Cart.objects.filter(user=request.user)

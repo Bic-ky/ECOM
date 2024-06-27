@@ -1,7 +1,7 @@
 {% extends 'base2.html' %}
 {% load static %}
 
-{% block dashb %}
+{% block content %}
 {% include 'includes/alerts.html' %}
 <!-- start page title -->
 <div class="row">
@@ -52,23 +52,22 @@
                         <div class="table-responsive">
                             <table class="table mt-4">
                                 <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>No of Share</th>
-                                    <th>Share Value</th>
-                                </tr></thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {% for item in ordered_product %}
-                                <tr>
-                                    
-                                    <td>
-                                        <img src="{{ item.project.farm_image.url }}" width="60" alt="Product Image">{{ item.project }}
-                                    </td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td>रु‎{{ item.project.value_of_share}}</td>
-                                </tr>
-                                {% endfor %}
-
+                                    <tr>
+                                        <td>
+                                            <img src="{{ item.product.image.url }}" width="60" alt="Product Image">{{ item.project }}
+                                        </td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td> $ {{ item.amount }}</td>
+                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -78,7 +77,6 @@
                     <div class="col-6">
                         <div class="clearfix pt-5">
                             <h6 class="text-muted"></h6>
-
                             <small>
                                
                             </small>
@@ -87,18 +85,18 @@
                     </div>
                     <div class="col-6">
                         <div class="float-right">
-                            <p><b>Sub-total:</b> रु‎ {{ subtotal }}</p>
+                            <p><b>Sub-total:</b> <b>$ {{ subtotal }} </b></p>
                             {% for key, value in tax_data.items %}
                             {% for i, j in value.items %}
                             <li style="list-style-type: none;">
                                 <b>{{ key }} <small>({{ i }}%)</small>:</b>
-                                    रु‎
+                                    $
                                     <span id="tax-{{ key }}">{{ j }}</span>
                             </li>
                             {% endfor %}
                             {% endfor %}
                             <br>
-                            <h3> रु‎ {{ order.total }} NPR</h3>
+                            <h3> Total : $ {{ order.total }} </h3>
                         </div>
                         <div class="clearfix"></div>
                     </div>

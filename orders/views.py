@@ -100,7 +100,7 @@ def payments(request):
         order.is_ordered = True
         order.save()
 
-        # MOVE THE CART ITEMS TO ORDERED FOOD MODEL
+        # MOVE THE CART ITEMS TO ORDERED PRODUCT MODEL
         cart_items = Cart.objects.filter(user=request.user)
         for item in cart_items:
             ordered_product = ProductOrder()
@@ -136,6 +136,7 @@ def payments(request):
 
         # CLEAR THE CART IF THE PAYMENT IS SUCCESS
         # cart_items.delete() 
+        Cart.objects.filter(user=request.user).delete()
 
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
         response = {
