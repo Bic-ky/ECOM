@@ -1,341 +1,74 @@
-<!-- prettier-ignore -->
 {% extends 'base2.html' %}
 {% load static %}
-{% block dashb %}
+{% block content %}
 
 {% include 'includes/alerts.html' %}
 <!-- Main Section Start -->
 
 <div class="col-xl-10">
-  <div class="card">
-    <div class="card-body">
-      <h2 class="text-center">Manage Profile</h2>
-      {% if not user.is_verified %}
-      <h5 style="text-align: center; color: red">
-        Please update your profile to verify your account.
-      </h5>
-      {% endif %}
-      <br />
-      <form
-        action="{% url 'account:vprofile' %}"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        {% csrf_token %} {% comment %} profile picture code {% endcomment %}
-        <div class="text-center">
-          {% if profile.profile_picture %}
-          <img
-            src="{{ profile.profile_picture.url }}"
-            alt="Profile Picture"
-            style="max-height: 280px; max-width: 200px; border-radius: 5%"
-          />
-          {% else %}
-          <img
-            src="{% static 'ecom/img/def_profile.jpg' %}"
-            alt="Profile Picture"
-            style="max-height: 280px; max-width: 200px; border-radius: 5%"
-          />
-          {% endif %}
+	<div class="card pb-5">
+		<div class="card-body">
+			<h2 class=" text-center">Manage Profile</h2>
+			<br>
+			<form action="{% url 'vprofile' %}" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				
+				{% comment %} profile picture code  {% endcomment %}
+				<div class="text-center">
+					{% if profile.profile_picture %}
+						<img  src="{{ profile.profile_picture.url }}" alt="Profile Picture"  style="max-height: 280px; max-width: 200px; border-radius: 5%;">
+					{% else %}
+						<img src="{% static 'img/logo.png' %}" alt="Profile Picture" style="max-height: 280px; max-width: 200px; border-radius: 5%;"
+						>
+					{% endif %}
+				</div>
+				<div class="text-center">
+					<label><b>Update Profile Picture</b></label>
+					<div class="col-xl-12">
+						<label for="profile-picture" class="btn btn-success btn-rounded waves-effect waves-light" style="background-color: #09c199; color: white;">
+							<i class="fas fa-paperclip"></i> Change Photo
+						  </label>
+						  <input type="file" class="d-none" name="profile_picture" id="profile-picture">
+					</div>
+					<label class="labels">{{ profile_form.profile_picture.errors }}</label>
+				</div>
         </div>
-        <div class="text-center">
-          <label><b>Update Profile Picture</b></label>
-          <div class="col-xl-12">
-            <label
-              for="profile-picture"
-              class="btn btn-success btn-rounded waves-effect waves-light"
-              style="background-color: #09c199; color: white"
-            >
-              <i class="fas fa-paperclip"></i> Attach File
-            </label>
-            <input
-              type="file"
-              class="d-none"
-              name="profile_picture"
-              id="profile-picture"
-            />
-          </div>
-          <label class="labels"
-            >{{ profile_form.profile_picture.errors }}</label
-          >
-        </div>
+        <div class="container">
+			<div class="row">
+			  <div class="col-6">
+				<div class="form-group">
+				  <label><b>Country *</b></label>
+				  {{ profile_form.country }}
+				</div>
+			  </div>
+			  <div class="col-6">
+					<label><b>Address *</b></label>
+					{{profile_form.address}}
+					<small class="text-muted float-right" style="color: darkblue"
+					  >powered by Google</small
+					>
+			  </div>
+			  <div class="col-6">
+				<div class="form-group">
+				  <label><b>State *</b></label>
+				  {{ profile_form.state }}
+				</div>
+			  </div>
+			  <div class="col-6">
+				<div class="form-group">
+				  <label><b>City *</b></label>
+				  {{ profile_form.city }}
+				</div>
+			  </div>
+			</div>
+			<button type="submit" class="btn btn-primary btn-rounded waves-effect waves-light pd-5">Submit</button>
+		  </div>
+				
+			</form>
 
-        <label> Choose Documents *</label>
-        <div class="col-xl-12">
-          <div class="mb-4">
-            <p>
-              <a
-                class="btn btn-outline-success btn-rounded waves-effect waves-light"
-                data-toggle="collapse"
-                href="#collapseP"
-                aria-expanded="false"
-                aria-controls="collapseExample"
-                style="margin-left: -10px"
-              >
-                Passport
-              </a>
-              <a
-                class="btn btn-outline-success btn-rounded waves-effect waves-light ml-10"
-                data-toggle="collapse"
-                href="#collapseN"
-                aria-expanded="false"
-                aria-controls="collapseExample"
-                style="margin-left: 20px"
-              >
-                Citizenship
-              </a>
-            </p>
-            <div class="collapse" id="collapseP">
-              <div class="card card-body">
-                <div style="display: flex; align-items: center">
-                  <div class="text-left" style="margin-right: 10px">
-                    {% if profile.passport_photo %}
-                    <img
-                      src="{{ profile.passport_photo.url }}"
-                      alt="e"
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% else %}
-                    <img
-                      src="{% static 'images/default-passport.png' %}"
-                      alt=""
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% endif %}
-                  </div>
-                  <div>
-                    <label><b>Update Passport Photo</b></label>
-                    <div>
-                      <input
-                        type="file"
-                        class="dropify"
-                        name="passport_photo"
-                        id="passport-photo"
-                        style="background-color: #00a474; color: white"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <label class="labels"
-                  >{{ profile_form.passport_photo.errors }}</label
-                >
-              </div>
-            </div>
-
-            <div class="collapse" id="collapseN">
-              <div class="card">
-                <div style="display: flex; align-items: center">
-                  <div class="text-left" style="margin-right: 10px">
-                    {% if profile.citizenship_front %}
-                    <img
-                      src="{{ profile.citizenship_front.url }}"
-                      alt=""
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% else %}
-                    <img
-                      src="{% static 'images/default-citizenship.png' %}"
-                      alt=""
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% endif %}
-                  </div>
-                  <div>
-                    <label><b> Citizenship Front </b></label>
-                    <div class="col-xl-12">
-                      <input
-                        type="file"
-                        class="dropify"
-                        data-width="100"
-                        name="citizenship_front"
-                        id="citizenship-front"
-                        style="background-color: #00a474; color: white"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <label class="labels"
-                  >{{ profile_form.citizenship_front.errors }}</label
-                >
-              </div>
-              <br />
-              <div class="card card-body">
-                <div style="display: flex; align-items: center">
-                  <div class="text-left" style="margin-right: 10px">
-                    {% if profile.citizenship_back %}
-                    <img
-                      src="{{ profile.citizenship_back.url }}"
-                      alt=""
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% else %}
-                    <img
-                      src="{% static 'images/default-citizenship.png' %}"
-                      alt=""
-                      class="avatar-md rounded-circle img-thumbnail"
-                    />
-                    {% endif %}
-                  </div>
-                  <div>
-                    <label><b> Citizenship Back </b></label>
-                    <div class="col-xl-12">
-                      <input
-                        type="file"
-                        class="dropify"
-                        name="citizenship_back"
-                        id="citizenship-back"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <label class="labels"
-                  >{{ profile_form.citizenship_back.errors }}</label
-                >
-              </div>
-            </div>
-          </div>
-          <!-- end .mb-4 -->
-        </div>
-        <!-- end col -->
-
-        <label><b>Do you have a company?(If Yes)</b></label>
-        <br />
-        <a
-          class="btn btn-outline-success btn-rounded waves-effect waves-light mb-20"
-          data-toggle="collapse"
-          href="#collapseD"
-          aria-expanded="false"
-          aria-controls="collapseExample"
-        >
-          Upload Documents *
-        </a>
-        <div class="collapse" id="collapseD">
-          <div class="col-xl-12">
-            <div class="card">
-              <div class="card-body">
-                <label><b> Company Registration </b></label>
-                <input
-                  type="file"
-                  class="dropify"
-                  data-max-file-size="1M"
-                  name="company_registeration"
-                  id="company_registeration"
-                />
-              </div>
-              <!-- end card-body-->
-            </div>
-            <!-- end card-->
-          </div>
-          <!-- end col -->
-
-          <div class="col-xl-12">
-            <div class="card">
-              <div class="card-body">
-                <label><b> Upload Company Logo </b></label>
-                <input
-                  type="file"
-                  class="dropify"
-                  data-max-file-size="1M"
-                  name="vendor_logo"
-                  id="vendor_logo"
-                />
-              </div>
-              <!-- end card-body-->
-            </div>
-            <!-- end card-->
-          </div>
-          <!-- end col -->
-        </div>
-        <div class="form-group" style="margin-top: 20px">
-          <label>First Name *</label>
-          {{ profile_form.first_name }}
-        </div>
-
-        <div class="form-group">
-          <label>Last Name *</label>
-          {{ profile_form.last_name }}
-        </div>
-
-        <div class="form-group">
-          <label><b>Write about yourself *</b></label>
-          {{vendor_form.vendor_description}}
-        </div>
-
-        
-        <div class="form-group">
-          <label><b>Email *</b></label>
-          {{ profile_form.email }}
-        </div>
-        
-        <div class="form-group">
-          <label><b>Gender</b></label>
-          {{ profile_form.gender }}
-        </div>
-        
-        <div class="form-group">
-          <label><b>Address *</b></label>
-          {{profile_form.address}}
-          <small class="text-muted float-right" style="color: darkblue"
-            >powered by Google</small
-          >
-        </div>
-        <div class="form-group">
-          <label><b>Country *</b></label>
-          {{profile_form.country}}
-        </div>
-        <div class="form-group">
-          <label><b>State *</b></label>
-          {{profile_form.state}}
-        </div>
-        <div class="form-group">
-          <label><b>City *</b></label>
-          {{profile_form.city}}
-        </div>
-        <div class="form-group">
-          <label><b>Pin Code *</b></label>
-          {{profile_form.pin_code}}
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label><b>Facebook</b></label>
-              {{ profile_form.facebook }}
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="form-group">
-              <label><b>LinkedIn</b></label>
-              {{ profile_form.linkedin }}
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="form-group">
-              <label><b>Twitter</b></label>
-              {{ profile_form.twitter }}
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="form-group">
-              <label><b>Instagram</b></label>
-              {{ profile_form.instagram }}
-            </div>
-          </div>
-        </div>
-        <button
-          type="submit"
-          class="btn btn-primary btn-rounded waves-effect waves-light"
-        >
-          Submit
-        </button>
-      </form>
-    </div>
-    <!-- end card-body-->
-  </div>
-  <!-- end card-->
+		</div> <!-- end card-body-->
+	</div> <!-- end card-->
 </div>
 
 <!-- Main Section End -->
-{% endblock dashb %}
+{% endblock content %}

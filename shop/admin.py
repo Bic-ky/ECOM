@@ -5,8 +5,8 @@ from .models import Category, Product , Cart, Tax
 
 class ProductItemAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('product_title',)}
-    list_display = ('product_title', 'category', 'vendor', 'price', 'is_available', 'updated_at')
-    search_fields = ('product_title', 'category__category_name', 'vendor__vendor_name', 'price')
+    list_display = ('product_title', 'category', 'price', 'is_available', 'updated_at')
+    search_fields = ('product_title', 'category__category_name', 'price')
     list_filter = ('is_available',)
 
 

@@ -1,7 +1,8 @@
 
 from django.shortcuts import get_object_or_404, redirect, render
 from customers.forms import UserProfileForm
-from shop.models import Category
+from orders.models import Order
+from shop.models import Category, Product
 from vendor.forms import VendorForm
 from shop.forms import ProductItemForm
 
@@ -11,80 +12,88 @@ from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from account.views import check_role_vendor
+
 from django.template.defaultfilters import slugify
 
-
-def get_vendor(request):
-    vendor = Vendor.objects.get(user=request.user)
-    return vendor
-
-
-
+@login_required(login_url='login')
 def vprofile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
-    vendor = get_object_or_404(Vendor, user=request.user)
 
     if request.method == 'POST':
+        print(request.POST)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        vendor_form = VendorForm(request.POST, request.FILES, instance=vendor)
-        if profile_form.is_valid() and vendor_form.is_valid():
+        print(profile_form)
+        if profile_form.is_valid() :
             profile_form.save()
-            vendor_form.save()
-            messages.success(request, 'Settings updated.')
+            messages.success(request, 'Profile updated')
             return redirect('vprofile')
         else:
             print(profile_form.errors)
-            print(vendor_form.errors)
+            
     else:
-        profile_form = UserProfileForm(instance = profile)
-        vendor_form = VendorForm(instance=vendor)
+       
+        profile_form = UserProfileForm(instance=profile)
+        
 
     context = {
         'profile_form': profile_form,
-        'vendor_form': vendor_form,
         'profile': profile,
-        'vendor': vendor,
     }
     return render(request, 'vendor/vprofile.html', context)
 
 
 
+def get_vendor(request):
+    try:
+        return Vendor.objects.get(user=request.user)
+    except Vendor.DoesNotExist:
+        return None
 
 
-# @login_required(login_url='login')
-# @user_passes_test(check_role_vendor)
-# def productitems_by_category(request, pk=None):
-#     vendor = get_vendor(request)
-#     category = get_object_or_404(Category, pk=pk)
-#     productitems = productItem.objects.filter(vendor=vendor, category=category)
-#     context = {
-#         'productitems': productitems,
-#         'category': category,
-#     }
-#     return render(request, 'vendor/productitems_by_category.html', context)
+from django.db.models import Count , Prefetch
+from shop.models import Category
+
+def product_builder(request):
+    # Prefetch related products for each category
+    categories = Category.objects.annotate(num_projects=Count('products')).prefetch_related(
+        Prefetch('products', queryset=Product.objects.all())
+    ).order_by('created_at')
+    
+    for category in categories:
+        print(category.products.all())  # Debug: print related products for each category
+    
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'vendor/product_builder.html', context)
 
 
 
-
-# @login_required(login_url='login')
-# @user_passes_test(check_role_vendor)
 def add_product(request):
+    vendor = get_vendor(request)
+    print(f"Vendor: {vendor}")  # Debugging line
+    
+    if vendor is None:
+        messages.error(request, 'You are not authorized to add products.')
+      
+
     if request.method == 'POST':
         form = ProductItemForm(request.POST, request.FILES)
         if form.is_valid():
             productTitle = form.cleaned_data['product_title']
             product = form.save(commit=False)
-            product.vendor = get_vendor(request)
+            product.vendor = vendor  # Ensure vendor is set
             product.slug = slugify(productTitle)
-            form.save()
-            messages.success(request, 'product Item added successfully!')
-            return redirect('productitems_by_category', product.category.id)
+            product.save()
+            messages.success(request, 'Product Item added successfully!')
+            return redirect("product_category")
         else:
             print(form.errors)
     else:
         form = ProductItemForm()
-        # modify this form
-        # form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
+        # Optionally, filter categories based on vendor if needed
+        # form.fields['category'].queryset = Category.objects.filter(vendor=vendor)
+
     context = {
         'form': form,
     }
@@ -92,51 +101,61 @@ def add_product(request):
 
 
 
-# @login_required(login_url='login')
-# @user_passes_test(check_role_vendor)
-# def edit_product(request, pk=None):
-#     product = get_object_or_404(productItem, pk=pk)
-#     if request.method == 'POST':
-#         form = productItemForm(request.POST, request.FILES, instance=product)
-#         if form.is_valid():
-#             producttitle = form.cleaned_data['product_title']
-#             product = form.save(commit=False)
-#             product.vendor = get_vendor(request)
-#             product.slug = slugify(producttitle)
-#             form.save()
-#             messages.success(request, 'product Item updated successfully!')
-#             return redirect('productitems_by_category', product.category.id)
-#         else:
-#             print(form.errors)
-
-#     else:
-#         form = productItemForm(instance=product)
-#         form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
-#     context = {
-#         'form': form,
-#         'product': product,
-#     }
-#     return render(request, 'vendor/edit_product.html', context)
+def productItem_by_category(request, pk=None):
+    category = get_object_or_404(Category, pk=pk)
+    productItems = Product.objects.filter(category=category)
+    print(productItems.query)  # Print the SQL query
+    
+    context = {
+        'productItems': productItems,
+        'category': category,
+    }
+    return render(request, 'vendor/productItem_by_category.html', context)
 
 
 # @login_required(login_url='login')
 # @user_passes_test(check_role_vendor)
-# def delete_product(request, pk=None):
-#     product = get_object_or_404(productItem, pk=pk)
-#     product.delete()
-#     messages.success(request, 'product Item has been deleted successfully!')
-#     return redirect('productitems_by_category', product.category.id)
+def edit_product(request, pk=None):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        form = ProductItemForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            productTitle = form.cleaned_data['product_title']
+            product = form.save(commit=False)
+            product.slug = slugify(productTitle)
+            form.save()
+            messages.success(request, 'Product Item updated successfully!')
+            return redirect('product_category', product.category.id)
+        else:
+            print(form.errors)
+
+    else:
+        form = ProductItemForm(instance=product)
+        # form.fields['category'].queryset = Category.objects.f
+    context = {
+        'form': form,
+        'product': product,
+    }
+    return render(request, 'vendor/edit_product.html', context)
 
 
-# def opening_hours(request):
-#     opening_hours = OpeningHour.objects.filter(vendor=get_vendor(request))
-#     form = OpeningHourForm()
-#     context = {
-#         'form': form,
-#         'opening_hours': opening_hours,
-#     }
-#     return render(request, 'vendor/opening_hours.html', context)
+# @login_required(login_url='login')
+# @user_passes_test(check_role_vendor)
+def delete_product(request, pk=None):
+    product = get_object_or_404(Product, pk=pk)
+    product.delete()
+    messages.success(request, 'product Item has been deleted successfully!')
+    return redirect('product_category', product.category.id)
 
+
+
+def my_orders(request):
+    orders = Order.objects.filter(is_ordered=True).order_by('-created_at')
+
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'vendor/my_orders.html', context)
 
 # def order_detail(request, order_number):
 #     try:
