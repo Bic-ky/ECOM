@@ -20,35 +20,23 @@ logger = logging.getLogger(__name__)
 def shop_view(request):
     categories = Category.objects.all()
     products = Product.objects.filter(is_available=True)
+    category_id = request.GET.get('category')
+
+    if category_id:
+        category = get_object_or_404(Category, id=category_id)
+        products = products.filter(category=category)
+
+    # Fetch most popular products based on the number of orders
+    popular_products = Product.objects.annotate(num_orders=Count('order')).order_by('-num_orders')[:3]
+
     page = request.GET.get('page')
-    search_query = request.GET.get('search_query')
-    sort_by = request.GET.get('sort_by')
-
-    if search_query and search_query.strip() != '':
-        product_ids = []
-        for product in products:
-            if (product.product_title and product.product_title.lower().find(search_query.lower()) != -1) or \
-                    (product.address and product.address.lower().find(search_query.lower()) != -1):
-                product_ids.append(product.id)
-
-        user_profile_ids = [profile.user.id for profile in UserProfile.objects.filter(
-            Q(first_name__icontains=search_query) | Q(
-                last_name__icontains=search_query)
-        )]
-
-
-        products = products.filter(Q(id__in=product_ids))
-
-
-    paginator = Paginator(products, 8)
+    paginator = Paginator(products, 9)  # Display 9 products per page
     product_page = paginator.get_page(page)
-    print(product_page)
+
     context = {
-        # 'top_Products': top_products,
         'categories': categories,
         'product_page': product_page,
-        'sort_by': sort_by,
-        'products': products
+        'popular_products': popular_products,  # Add popular products to the context
     }
 
     return render(request, 'shop/product.html', context)

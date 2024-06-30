@@ -172,7 +172,7 @@ def custDashboard(request):
     }
     return render(request, 'account/custDashboard.html' , context)
 
-@login_required(login_url='account:login')
+@login_required(login_url='login')
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
     vendor = request.user

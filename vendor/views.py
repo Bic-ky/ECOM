@@ -15,7 +15,12 @@ from account.views import check_role_vendor
 
 from django.template.defaultfilters import slugify
 
+
+from django.db.models import Count , Prefetch
+from shop.models import Category
+
 @login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def vprofile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
 
@@ -42,7 +47,6 @@ def vprofile(request):
     return render(request, 'vendor/vprofile.html', context)
 
 
-
 def get_vendor(request):
     try:
         return Vendor.objects.get(user=request.user)
@@ -50,9 +54,8 @@ def get_vendor(request):
         return None
 
 
-from django.db.models import Count , Prefetch
-from shop.models import Category
-
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def product_builder(request):
     # Prefetch related products for each category
     categories = Category.objects.annotate(num_projects=Count('products')).prefetch_related(
@@ -68,7 +71,8 @@ def product_builder(request):
     return render(request, 'vendor/product_builder.html', context)
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def add_product(request):
     vendor = get_vendor(request)
     print(f"Vendor: {vendor}")  # Debugging line
@@ -100,7 +104,8 @@ def add_product(request):
     return render(request, 'vendor/add_product.html', context)
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def productItem_by_category(request, pk=None):
     category = get_object_or_404(Category, pk=pk)
     productItems = Product.objects.filter(category=category)
@@ -113,8 +118,8 @@ def productItem_by_category(request, pk=None):
     return render(request, 'vendor/productItem_by_category.html', context)
 
 
-# @login_required(login_url='login')
-# @user_passes_test(check_role_vendor)
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def edit_product(request, pk=None):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
@@ -139,8 +144,9 @@ def edit_product(request, pk=None):
     return render(request, 'vendor/edit_product.html', context)
 
 
-# @login_required(login_url='login')
-# @user_passes_test(check_role_vendor)
+
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def delete_product(request, pk=None):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
@@ -148,17 +154,18 @@ def delete_product(request, pk=None):
     return redirect('product_category', product.category.id)
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def my_orders(request):
     orders = Order.objects.filter(is_ordered=True).order_by('-created_at')
-
     context = {
         'orders': orders,
     }
     return render(request, 'vendor/my_orders.html', context)
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
 def order_detail(request, order_number):
     try:
         order = get_object_or_404(Order, order_number=order_number)
@@ -177,11 +184,3 @@ def order_detail(request, order_number):
     except Order.DoesNotExist:
         return redirect('vendor')  # Redirect to vendor page if order does not exist
 
-# def my_orders(request):
-#     vendor = Vendor.objects.get(user=request.user)
-#     orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by('created_at')
-
-#     context = {
-#         'orders': orders,
-#     }
-#     return render(request, 'vendor/my_orders.html', context)
