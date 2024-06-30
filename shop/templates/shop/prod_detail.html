@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="ltn__product-details-menu-2">
                                     <ul>
-                                        {% if user.is_authenticated and user.role == 'CUSTOMER' %}
+                                        {% if user.is_authenticated and user.role == 2 %}
                                         <li>
                                             <a href="#" class="decrease_cart" data-id="{{ prod.id }}" data-url="{% url 'decrease_cart' prod.id %}" style="margin-right: 10px;">
                                                 <img src="{% static 'img/minus.png' %}">

@@ -275,7 +275,7 @@ def user_change_password(request):
                 request, 'Your password was successfully updated!')
             logout(request)  # Log out the user
 
-            if request.user.role == 2:
+            if user.role == 2:
                 return redirect('custDashboard')
     else:
         # Pass user=request.user to initialize the form with the user's data
@@ -294,9 +294,11 @@ def vendor_change_password(request):
                 request, 'Your password was successfully updated!')
             logout(request)  # Log out the user
 
-            if request.user.role == 1:
+            if user.role == 1:
                 return redirect('vendorDashboard')
     else:
         # Pass user=request.user to initialize the form with the user's data
         form = CustomPasswordChangeForm(user=request.user)
     return render(request, 'account/change_password.html', {'form': form})
+
+

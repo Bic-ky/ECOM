@@ -18,3 +18,5 @@ def index(request):
         'recent_products': recent_products,
     }
     return render(request, 'index.html', context)
+
+
