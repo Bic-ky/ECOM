@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product , Cart, Tax
+from .models import Category, Product , Cart, Tax , Enquiry
 
 
 
@@ -14,3 +14,4 @@ admin.site.register(Category)
 admin.site.register(Product, ProductItemAdmin)
 admin.site.register(Cart)
 admin.site.register(Tax)
+admin.site.register(Enquiry)
