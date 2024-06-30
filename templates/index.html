@@ -19,7 +19,7 @@
                                         <p>Create your style without compromising comfort.</p>
                                     </div>
                                     <div class="btn-wrapper animated">
-                                        <a href="about.html" class="theme-btn-2 btn btn-effect-2">Learn More</a>
+                                        <a href="" class="theme-btn-2 btn btn-effect-2">Learn More</a>
                                     </div>
                                 </div>
                             </div>
@@ -90,76 +90,30 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="section-title-area ltn__section-title-2 text-center">
-                    <h6 class="section-subtitle ltn__secondary-color"><span><i class="fas fa-square-full"></i></span> Construction Projects</h6>
+                    <h6 class="section-subtitle ltn__secondary-color"><span><i class="fas fa-square-full"></i></span> New Launch</h6>
                     <h1 class="section-title">Our Recent Collection</h1>
                 </div>
             </div>
         </div>
         <div class="row ltn__image-slider-3-active slick-arrow-1 slick-arrow-1-inner---">
+            {% for product in recent_products %}
             <div class="col-lg-12">
                 <div class="ltn__img-slide-item-3 ltn__img-slide-item-3-2">
                     <a href="portfolio-details.html">
-                        <img src="{% static "img/product-4/1.jpg" %}" alt="Image">
+                        <img src="{{product.image.url}}" alt="Image" style="height: 400px; object-fit: contain;">
                     </a>
                     <div class="ltn__img-slide-info">
                         <div class="ltn__img-slide-info-brief">
-                            <h6>Construction</h6>
-                            <h1><a href="portfolio-details.html">Contemporary Vilas</a></h1>
+                            <h6>{{product.category}}</h6>
+                            <h1><a href="portfolio-details.html"> {{product.product_title}} </a></h1>
                         </div>
                         <div class="btn-wrapper">
-                            <a href="portfolio-details.html" class="btn-- theme-btn-1-- btn-effect-1--">View Properties<i class="flaticon-right-arrow"></i></a>
+                            <a href="{% url "product_detail" id=product.id %}" class="btn-- theme-btn-1-- btn-effect-1--">View Product<i class="flaticon-right-arrow"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
-                <div class="ltn__img-slide-item-3 ltn__img-slide-item-3-2">
-                    <a href="portfolio-details.html">
-                        <img src="{% static "img/product-4/2.jpg" %}" alt="Image">
-                    </a>
-                    <div class="ltn__img-slide-info">
-                        <div class="ltn__img-slide-info-brief">
-                            <h6>Construction</h6>
-                            <h1><a href="portfolio-details.html">Empire State Building</a></h1>
-                        </div>
-                        <div class="btn-wrapper">
-                            <a href="portfolio-details.html" class="btn-- theme-btn-1-- btn-effect-1--">View Properties<i class="flaticon-right-arrow"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="ltn__img-slide-item-3 ltn__img-slide-item-3-2">
-                    <a href="portfolio-details.html">
-                        <img src="{% static "img/product-4/3.jpg" %}" alt="Image">
-                    </a>
-                    <div class="ltn__img-slide-info">
-                        <div class="ltn__img-slide-info-brief">
-                            <h6>Construction</h6>
-                            <h1><a href="portfolio-details.html">Central park Tower</a></h1>
-                        </div>
-                        <div class="btn-wrapper">
-                            <a href="portfolio-details.html" class="btn-- theme-btn-1-- btn-effect-1--">View Properties<i class="flaticon-right-arrow"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="ltn__img-slide-item-3 ltn__img-slide-item-3-2">
-                    <a href="portfolio-details.html">
-                        <img src="{% static "img/product-4/1.jpg" %}" alt="Image">
-                    </a>
-                    <div class="ltn__img-slide-info">
-                        <div class="ltn__img-slide-info-brief">
-                            <h6>Construction</h6>
-                            <h1><a href="portfolio-details.html">Contemporary Vilas</a></h1>
-                        </div>
-                        <div class="btn-wrapper">
-                            <a href="portfolio-details.html" class="btn-- theme-btn-1-- btn-effect-1--">View Properties<i class="flaticon-right-arrow"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -194,7 +148,6 @@
                             </div>
                             <div class="ltn__testimoni-name-designation">
                                 <h5>Jacob William</h5>
-                                <label>Selling Agents</label>
                             </div>
                         </div>
                     </div>
@@ -216,7 +169,6 @@
                             </div>
                             <div class="ltn__testimoni-name-designation">
                                 <h5>Jacob William</h5>
-                                <label>Selling Agents</label>
                             </div>
                         </div>
                     </div>
@@ -238,7 +190,6 @@
                             </div>
                             <div class="ltn__testimoni-name-designation">
                                 <h5>Jacob William</h5>
-                                <label>Selling Agents</label>
                             </div>
                         </div>
                     </div>
@@ -260,7 +211,6 @@
                             </div>
                             <div class="ltn__testimoni-name-designation">
                                 <h5>Jacob William</h5>
-                                <label>Selling Agents</label>
                             </div>
                         </div>
                     </div>
@@ -271,28 +221,7 @@
     </div>
 </div>
 <!-- TESTIMONIAL AREA END -->
-<script>
-    var counterContainer = document.querySelector(".website-counter");
-    var resetButton = document.querySelector("#reset");
-    
-    function updateCount() {
-        fetch("{% url 'vendorDashboard' %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            counterContainer.innerHTML = data.count;
-        });
-    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        updateCount();
-    });
-
-</script>
 
 {% endblock content %}
 

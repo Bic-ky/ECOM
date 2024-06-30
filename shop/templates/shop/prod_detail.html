@@ -89,6 +89,7 @@
                                 </div>
                                 <div class="ltn__product-details-menu-2">
                                     <ul>
+                                        {% if user.is_authenticated and user.role == 'CUSTOMER' %}
                                         <li>
                                             <a href="#" class="decrease_cart" data-id="{{ prod.id }}" data-url="{% url 'decrease_cart' prod.id %}" style="margin-right: 10px;">
                                                 <img src="{% static 'img/minus.png' %}">
@@ -105,10 +106,9 @@
                                                 <span>CART</span>
                                             </a>
                                         </li>
-                                    
                                     </ul>
+                                    {% endif %}
                                 </div>
-                                <hr>
                             </div>
                         </div>
                     </div>
@@ -138,57 +138,49 @@
                 <aside class="sidebar ltn__shop-sidebar ltn__right-sidebar">
                     <!-- Top Rated Product Widget -->
                     <div class="widget ltn__top-rated-product-widget">
-                        <h4 class="ltn__widget-title ltn__widget-title-border">Top Rated Product</h4>
+                        <h4 class="ltn__widget-title ltn__widget-title-border">Popular Products</h4>
                         <ul>
+                            {% for popular_product in popular_products %}
                             <li>
                                 <div class="top-rated-product-item clearfix">
                                     <div class="top-rated-product-img">
-                                        <a href="product-details.html"><img src="{{prod.image.url}}" alt="#"></a>
+                                        <a href="{% url 'product_detail' id=popular_product.id %}">
+                                            <img src="{{ popular_product.image.url }}" alt="#" style=" object-fit: contain;">
+                                        </a>
                                     </div>
                                     <div class="top-rated-product-info">
-
-                                        <h6><a href="product-details.html">Mixel Solid Seat Cover</a></h6>
+                                        <h6 class="product-title"><a href="{% url 'product_detail' id=popular_product.id %}">{{ popular_product.product_title }}</a></h6>
                                         <div class="product-price">
-                                            <span>$ 49.00</span>
-    
+                                            <span>Price: ${{ popular_product.price }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </li>
-                            <li>
-                                <div class="top-rated-product-item clearfix">
-                                    <div class="top-rated-product-img">
-                                        <a href="product-details.html"><img src="{{prod.image.url}}" alt="#"></a>
-                                    </div>
-                                    <div class="top-rated-product-info">
-                                        <h6><a href="product-details.html">Brake Conversion Kit</a></h6>
-                                        <div class="product-price">
-                                            <span>$ 49.00</span>
-    
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="top-rated-product-item clearfix">
-                                    <div class="top-rated-product-img">
-                                        <a href="product-details.html"><img src="{{prod.image.url}}" alt="#"></a>
-                                    </div>
-                                    <div class="top-rated-product-info">
-                                        <h6><a href="product-details.html">Coil Spring Conversion</a></h6>
-                                        <div class="product-price">
-                                            <span>$ 49.00</span>
-    
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
+                            {% endfor %}
                         </ul>
+                        <hr>
+                        <div class="related-products mt-50">
+                            <h4 class="ltn__widget-title ltn__widget-title-border">Similar Products</h4>
+                            <div class="row">
+                                {% for related_product in related_products %}
+                                <div class="col-md-4">
+                                    <div class="product-img">
+                                        <a href="{% url 'product_detail' id=related_product.id %}">
+                                            <img src="{{ related_product.image.url }}" alt="#" style=" object-fit: contain;">
+                                        </a>
+                                    </div>
+                                    <div class="top-rated-product-info">
+                                        <h6 class="product-title"><a href="{% url 'product_detail' id=related_product.id %}">{{ related_product.product_title }}</a></h6>
+                                        <div class="product-price">
+                                            <span>Price: ${{ related_product.price }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-                    <!-- Banner Widget -->
-                    <div class="widget ltn__banner-widget">
-                        <a href="shop.html"><img src="img/banner/2.jpg" alt="#"></a>
-                    </div>
+
                 </aside>
             </div>
         </div>

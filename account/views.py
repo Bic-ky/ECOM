@@ -22,7 +22,7 @@ from vendor.models import Vendor
 from orders.models import Order
 import datetime
 
-@login_required(login_url='account:login')
+@login_required(login_url='login')
 def myAccount(request):
     user = request.user
     if user.is_authenticated:
@@ -161,7 +161,7 @@ def logout(request):
 
 
 
-@login_required(login_url='account:login')
+@login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def custDashboard(request):
 

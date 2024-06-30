@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.db.models import Count
-from django.db.models import F
-from django.db.models import Q
+from django.contrib import messages
 from django.core.paginator import Paginator
 from account.models import User, UserProfile
+from shop.forms import ContactForm
 from orders.forms import OrderForm
 from .context_processors import get_cart_amounts, get_cart_counter
-from shop.models import Cart, Category , Product, Tax
-from django.forms import ValidationError
+from shop.models import Cart, Category , Product
 from django.shortcuts import render, get_object_or_404,redirect
 from django.http.response import JsonResponse
 from django.contrib.auth.decorators import login_required , user_passes_test
@@ -43,8 +42,16 @@ def shop_view(request):
 
 
 
-def product_detail(request , id):
+def product_detail(request, id):
+    # Get the current product
     product = get_object_or_404(Product, id=id)
+
+    # Fetch related products based on the same category, excluding the current product
+    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:3]
+
+    # Fetch most popular products based on the number of orders
+    popular_products = Product.objects.annotate(num_orders=Count('order')).order_by('-num_orders')[:3]
+
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -52,10 +59,11 @@ def product_detail(request , id):
     
     context = {
         'product': [product],
-        # 'related_products': related_products,
+        'related_products': related_products,
+        'popular_products': popular_products,
         'cart_items': cart_items,
     }
-    return render(request, "shop/prod_detail.html" , context)
+    return render(request, "shop/prod_detail.html", context)
 
 
 @login_required
@@ -77,7 +85,8 @@ def cart(request):
     return render(request, 'shop/cart.html', context)
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def add_to_cart(request, product_id):
     logger.info(f'add_to_cart called with product_id: {product_id}')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -108,7 +117,8 @@ def add_to_cart(request, product_id):
     else:
         return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def decrease_cart(request, product_id):
     logger.info(f'decrease_cart called with product_id: {product_id}')
     if request.user.is_authenticated:
@@ -144,7 +154,8 @@ def decrease_cart(request, product_id):
         return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
 
 
-@login_required
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def delete_cart(request, cart_id):
     logger.info(f'delete_cart called with cart_id: {cart_id}')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -169,7 +180,8 @@ def delete_cart(request, cart_id):
 
 
 
-
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def checkout(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
@@ -193,3 +205,17 @@ def checkout(request):
         'cart_items': cart_items,
     }
     return render(request,'shop/checkout.html',context )
+
+
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Add a success message
+            messages.success(request, 'Form submitted successfully!')
+            return redirect('contact')  
+    else:
+        form = ContactForm()
+    return render(request, "contact.html", {'form': form})

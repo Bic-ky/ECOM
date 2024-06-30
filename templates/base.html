@@ -59,10 +59,10 @@
                         <nav>
                             <div class="ltn__main-menu text-dark">
                                 <ul>
-                                    <li class="text-danger"><a href="">Home</a></li>
+                                    <li class="text-danger"><a href="{% url "index" %}">Home</a></li>
                                     <li class="menu-icon"><a href="#">About</a></li>            
                                     <li class="menu-icon"><a href="{% url "shop" %}">Shop</a></li>
-                                    <li class="menu-icon"><a href="">Contact</a></li>
+                                    <li class="menu-icon"><a href="{% url "contact" %}">Contact</a></li>
                                     <li>
                                          {% if user.is_authenticated %}
                                         <a href="{% url 'logout' %}">Logout</a></li>
@@ -129,10 +129,10 @@
         </div>
         <div class="ltn__utilize-menu">
             <ul>
-                <li class="text-danger"><a href="">Home</a></li>
+                <li class="text-danger"><a href="{% url "index" %}">Home</a></li>
                 <li class="menu-icon"><a href="#">About</a></li>            
-                <li class="menu-icon"><a href="">Shop</a></li>
-                <li class="menu-icon"><a href="">Contact</a></li>
+                <li class="menu-icon"><a href="{% url "shop" %}">Shop</a></li>
+                <li class="menu-icon"><a href="{% url "contact" %}">Contact</a></li>
                 <li>
                      {% if user.is_authenticated %}
                     <a href="{% url 'logout' %}">Logout</a></li>
@@ -204,7 +204,7 @@
                                         <i class="icon-mail"></i>
                                     </div>
                                     <div class="footer-address-info">
-                                        <p class="text-light"><a href="mailto:example@example.com">adhikari23@gmail.com</a></p>
+                                        <p class="text-light"><a href="mailto:example@example.com">info.stylesavvy@gmail.com</a></p>
                                     </div>
                                 </li>
                             </ul>
@@ -227,7 +227,7 @@
                                 <li><a href="">About</a></li>
                                 <li><a href="locations.html">Locations Map</a></li>
                                 <li><a href="">FAQ</a></li>
-                                <li><a href="">Contact us</a></li>
+                                <li><a href="{% url "contact" %}">Contact us</a></li>
                             </ul>
                         </div>
                     </div>
@@ -255,7 +255,7 @@
                                 <li><a href="wishlist.html">Wish List</a></li>
                                 
                                 <li><a href="">FAQ</a></li>
-                                <li><a href="">Contact us</a></li>
+                                <li><a href="{% url "contact" %}">Contact us</a></li>
                             </ul>
                         </div>
                     </div>
