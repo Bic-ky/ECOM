@@ -86,7 +86,7 @@ def add_product(request):
             product.slug = slugify(productTitle)
             product.save()
             messages.success(request, 'Product Item added successfully!')
-            return redirect("product_category")
+            return redirect("product_builder")
         else:
             print(form.errors)
     else:

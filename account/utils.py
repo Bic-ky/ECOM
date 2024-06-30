@@ -1,3 +1,5 @@
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -6,6 +8,9 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage, message
 from django.conf import settings
+from django.db.models import Sum
+
+from orders.models import Order
 
 def detectUser(user):
     if user.role == 1:
@@ -45,3 +50,21 @@ def send_notification(mail_subject, mail_template, context):
     mail = EmailMessage(mail_subject, message, from_email, to=to_email)
     mail.content_subtype = "html"
     mail.send()
+
+from django.db import connection
+
+def get_past_7_days_sales():
+    today = timezone.now().date()
+    dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    sales_data = []
+
+    for date in dates:
+        orders = Order.objects.filter(created_at__date=date, is_ordered=True)
+        total_sales = orders.aggregate(total_sales=Sum('total'))['total_sales'] or 0
+        total_sales = round(total_sales , 2)
+        sales_data.append({
+            'date': date.strftime('%Y-%m-%d'),
+            'total_sales': total_sales
+        })
+
+    return sales_data

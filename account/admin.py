@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, UserProfile
+from .models import User, UserProfile, VisitorCount
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
@@ -8,7 +8,6 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'phone_number')}),
         ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_active', 'is_superadmin', 'role')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
@@ -24,3 +23,4 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile)
+admin.site.register(VisitorCount)

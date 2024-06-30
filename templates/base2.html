@@ -8,11 +8,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="shortcut icon" href="{% static "img/logo.png" %}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
         <!-- App css -->
         <link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css" />
         <link href="{% static "assets/css/theme.css" %}" rel="stylesheet" type="text/css" />
         <link href="{% static "assets/css/icons.css" %}" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'plugins/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'plugins/datatables/responsive.bootstrap4.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'plugins/datatables/buttons.bootstrap4.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'plugins/datatables/select.bootstrap4.css' %}" rel="stylesheet" type="text/css" />
+
         <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_API_KEY}}&libraries=places&callback=initAutoComplete" async defer></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         
@@ -35,10 +42,27 @@
                         </button>
 
                         <div class="dropdown d-none d-sm-inline-block">
-                            <button type="button" class="btn header-item waves-effect"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                 Welcome, {{user.first_name}}
+                            <a href="{% url 'index' %}">
+                            <button type="button" class="btn header-item waves-effect">
+                                Home
                             </button>
+                            </a>
+                            
+                        </div>
+                        <div class="dropdown d-none d-sm-inline-block">
+                            <a href="">
+                            <button type="button" class="btn header-item waves-effect">
+                                About
+                            </button>
+                            </a>
+                            
+                        </div>
+                        <div class="dropdown d-none d-sm-inline-block">
+                            <a href="{% url 'shop' %}">
+                            <button type="button" class="btn header-item waves-effect">
+                                Market
+                            </button>
+                            </a>
                             
                         </div>
                     </div>
@@ -50,6 +74,7 @@
                                 aria-expanded="false">
                                 <i class="mdi mdi-magnify"></i>
                             </button>
+                        
                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0"
                                 aria-labelledby="page-header-search-dropdown">
 
@@ -108,7 +133,7 @@
 
                             {% if user.role == user.CUSTOMER %}
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
+                                <a href="{% url "custDashboard" %}" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
                             </li>
                             <li>
                                 <a href="{% url "cprofile" %}" class="waves-effect"><i class="mdi mdi-account"></i><span>Profile</span></a>
@@ -125,7 +150,7 @@
                             
                             {% elif user.role == user.VENDOR %}
                             <li>
-                                <a href="" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
+                                <a href="{% url "vendorDashboard" %}" class="waves-effect"><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
                             </li>
                             <li>
                                 <a href="{% url "product_builder"  %}" class="waves-effect"><i class="mdi mdi-box"></i><span>Products</span></a>
@@ -200,9 +225,27 @@
         <!-- Include Select2 library -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-
-        
-        <script src="{% static 'assets/js/message.js' %}"></script>
+        <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/dataTables.bootstrap4.js' %}"></script>
+        <script src="{% static 'plugins/datatables/dataTables.responsive.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/responsive.bootstrap4.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/dataTables.buttons.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/buttons.bootstrap4.min.js' %}"></script> 
+        <script src="{% static 'plugins/datatables/buttons.html5.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/buttons.flash.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/buttons.print.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/dataTables.keyTable.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/dataTables.select.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/pdfmake.min.js' %}"></script>
+        <script src="{% static 'plugins/datatables/vfs_fonts.js' %}"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#basic-datatable').DataTable();
+            });
+            $(document).ready(function() {
+                $('#datatable-buttons').DataTable();
+            });
+        </script>
 
 
     </body>

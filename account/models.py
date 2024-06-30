@@ -100,3 +100,8 @@ class UserProfile(models.Model):
         return super(UserProfile, self).save(*args, **kwargs)
 
 
+class VisitorCount(models.Model):
+    count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"Visitor Count: {self.count}"

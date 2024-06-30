@@ -271,7 +271,28 @@
     </div>
 </div>
 <!-- TESTIMONIAL AREA END -->
+<script>
+    var counterContainer = document.querySelector(".website-counter");
+    var resetButton = document.querySelector("#reset");
+    
+    function updateCount() {
+        fetch("{% url 'vendorDashboard' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            counterContainer.innerHTML = data.count;
+        });
+    }
 
+    document.addEventListener("DOMContentLoaded", () => {
+        updateCount();
+    });
+
+</script>
 
 {% endblock content %}
 

@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import message
+from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.http import urlsafe_base64_decode
@@ -10,10 +11,10 @@ from shop.models import Product
 from .forms import  UserForm , CustomPasswordChangeForm
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth import update_session_auth_hash
-from .models import User, UserProfile
+from .models import User, UserProfile, VisitorCount
 
 from django.contrib import messages, auth
-from .utils import detectUser, send_verification_email
+from .utils import detectUser, get_past_7_days_sales, send_verification_email
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -172,7 +173,37 @@ def custDashboard(request):
 
 
 def vendorDashboard(request):
-    return render(request, 'account/vendorDashboard.html')
+    vendor = request.user
+    # Fetch total orders and total revenue for the vendor
+    orders = Order.objects.filter( is_ordered=True)
+    orders_count = orders.count()
+    total_revenue = sum(order.total for order in orders)
+
+    # Fetch active projects
+    products = Product.objects.all()
+    product_count = products.count()
+
+    # Get visitor count
+    visitor_count, created = VisitorCount.objects.get_or_create(id=1)
+
+    sales_data = get_past_7_days_sales()
+    dates = [data['date'] for data in sales_data]
+    total_sales = [data['total_sales'] for data in sales_data]
+
+    recent_orders = Order.objects.order_by('-created_at')[:5]
+
+    context = {
+        'orders_count': orders_count,
+        'total_revenue': total_revenue,
+        'products': products,
+        'product_count': product_count ,
+        'visitor_count': visitor_count.count,
+        'dates': dates,
+        'total_sales': total_sales,
+        'recent_orders': recent_orders
+    }
+
+    return render(request, 'account/vendordashboard.html' , context)
 
 
 def forgot_password(request):
