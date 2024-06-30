@@ -161,7 +161,8 @@ def logout(request):
 
 
 
-
+@login_required(login_url='account:login')
+@user_passes_test(check_role_customer)
 def custDashboard(request):
 
     product = Product.objects.all()
@@ -171,7 +172,8 @@ def custDashboard(request):
     }
     return render(request, 'account/custDashboard.html' , context)
 
-
+@login_required(login_url='account:login')
+@user_passes_test(check_role_vendor)
 def vendorDashboard(request):
     vendor = request.user
     # Fetch total orders and total revenue for the vendor
@@ -261,7 +263,8 @@ def reset_password(request):
     return render(request, 'account/reset_password.html')
 
 
-@login_required
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def user_change_password(request):
     if request.method == 'POST':
         form = CustomPasswordChangeForm(request.user, request.POST)
@@ -272,10 +275,27 @@ def user_change_password(request):
                 request, 'Your password was successfully updated!')
             logout(request)  # Log out the user
 
-            if request.user.role == 'CUSTOMER':
-                return redirect('account:custDashboard')
-            elif request.user.role == 'VENDOR':
-                return redirect('account:vendorDashboard')
+            if request.user.role == 2:
+                return redirect('custDashboard')
+    else:
+        # Pass user=request.user to initialize the form with the user's data
+        form = CustomPasswordChangeForm(user=request.user)
+    return render(request, 'account/change_password.html', {'form': form})
+
+@login_required(login_url='login')
+@user_passes_test(check_role_vendor)
+def vendor_change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Update session
+            messages.success(
+                request, 'Your password was successfully updated!')
+            logout(request)  # Log out the user
+
+            if request.user.role == 1:
+                return redirect('vendorDashboard')
     else:
         # Pass user=request.user to initialize the form with the user's data
         form = CustomPasswordChangeForm(user=request.user)
