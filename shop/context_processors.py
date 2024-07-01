@@ -15,6 +15,9 @@ def get_cart_counter(request):
             cart_count = 0
     return dict(cart_count=cart_count)
 
+
+
+
 from decimal import Decimal, ROUND_HALF_UP
 
 def get_cart_amounts(request):

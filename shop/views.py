@@ -88,34 +88,29 @@ def cart(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def add_to_cart(request, product_id):
-    logger.info(f'add_to_cart called with product_id: {product_id}')
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        try:
-            product = get_object_or_404(Product, id=product_id)
-            logger.info(f'Product found: {product}')
-            cart_item, created = Cart.objects.get_or_create(user=request.user, project=product)
-            logger.info(f'Cart item: {cart_item}, created: {created}')
-            if not created:
-                cart_item.quantity = (cart_item.quantity or 0) + 1  # Ensure quantity is not None
-                cart_item.save()
-                logger.info(f'Increased quantity for cart item: {cart_item}')
-            else:
-                logger.info(f'Created new cart item: {cart_item}')
-            return JsonResponse({
-                'status': 'Success',
-                'message': 'Increased the cart quantity' if not created else 'Product added to the cart',
-                'cart_counter': get_cart_counter(request),
-                'qty': cart_item.quantity,
-                'cart_amount': get_cart_amounts(request)
-            })
-        except Product.DoesNotExist:
-            logger.error(f'Product with id {product_id} does not exist.')
-            return JsonResponse({'status': 'Failed', 'message': 'This product does not exist!'})
-        except Exception as e:
-            logger.error(f'Unexpected error in add_to_cart: {str(e)}')
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'})
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Check if the product item exists
+            try:
+                product = Product.objects.get(id=product_id)
+                # Check if the user has already added that product to the cart
+                try:
+                    chkCart = Cart.objects.get(user=request.user, project=product)
+                    # Increase the cart quantity
+                    chkCart.quantity += 1
+                    chkCart.save()
+                    return JsonResponse({'status': 'Success', 'message': 'Increased the cart quantity', 'cart_counter': get_cart_counter(request), 'qty': chkCart.quantity, 'cart_amount': get_cart_amounts(request)})
+                except:
+                    chkCart = Cart.objects.create(user=request.user, project=product, quantity=1)
+                    return JsonResponse({'status': 'Success', 'message': 'Added the product to the cart', 'cart_counter': get_cart_counter(request), 'qty': chkCart.quantity, 'cart_amount': get_cart_amounts(request)})
+            except:
+                return JsonResponse({'status': 'Failed', 'message': 'This product does not exist!'})
+        else:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
+        
     else:
-        return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
+        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+
 
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
@@ -140,13 +135,10 @@ def decrease_cart(request, product_id):
                     'cart_amount': get_cart_amounts(request)
                 })
             except Cart.DoesNotExist:
-                logger.error(f'Cart item for product {product_id} does not exist.')
                 return JsonResponse({'status': 'Failed', 'message': 'You do not have this item in your cart!'})
             except Product.DoesNotExist:
-                logger.error(f'Product with id {product_id} does not exist.')
                 return JsonResponse({'status': 'Failed', 'message': 'This product does not exist!'})
             except Exception as e:
-                logger.error(f'Unexpected error in decrease_cart: {str(e)}')
                 return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'})
         else:
             return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})

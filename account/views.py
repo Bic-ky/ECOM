@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import message
 from django.http import JsonResponse
@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.utils.http import urlsafe_base64_decode
 
 from shop.models import Product
+from django.db.models import Sum , Avg
 # from vendor.forms import VendorForm
 from .forms import  UserForm , CustomPasswordChangeForm
 from django.contrib.auth import authenticate, login as auth_login
@@ -19,7 +20,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
 from vendor.models import Vendor
-from orders.models import Order
+from orders.models import Order, ProductOrder
 import datetime
 
 @login_required(login_url='login')
@@ -167,11 +168,33 @@ def logout(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def custDashboard(request):
+    user = request.user
+    orders = Order.objects.filter(user=user)
+    # Get the current month and year
+    current_date = date.today()
+    current_month = current_date.month
+    current_year = current_date.year
 
-    product = Product.objects.all()
+    # Filter orders for the current month and for the specified user
+    current_month_orders = Order.objects.filter(user=user, created_at__month=current_month, created_at__year=current_year)
+
+    if orders.exists():
+        average_value = orders.aggregate(avg_value=Avg('total'))['avg_value']
+
+    orders_count = orders.count()
+    total_investment = orders.aggregate(Sum('total'))['total__sum'] or 0
+    
+    ordered_product = ProductOrder.objects.filter(user=user)
+    recent_orders = ProductOrder.objects.filter(user=request.user).order_by('-created_at')[:7]
 
     context = {
-        "product" : product 
+        'user': user,
+        'orders_count': orders_count,
+        'recent_orders': recent_orders,
+        'total_investment': total_investment,
+        'ordered_product': ordered_product,
+        'average_value': average_value,
+        'current_month_orders': current_month_orders.count,
     }
     return render(request, 'account/custDashboard.html' , context)
 

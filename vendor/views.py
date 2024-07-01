@@ -169,7 +169,7 @@ def my_orders(request):
 def order_detail(request, order_number):
     try:
         order = get_object_or_404(Order, order_number=order_number)
-        ordered_product = ProductOrder.objects.filter(order=order)
+        ordered_product = ProductOrder.objects.filter(order=order).order_by('-created_at')
         print(ordered_product)
         context = {
             'order': order,
