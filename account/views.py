@@ -101,8 +101,11 @@ def registerVendor(request):
             user.role = User.VENDOR
             user.is_active = True
             user.save()
+            
+            user_profile = UserProfile.objects.get(user=user)
+            Vendor.objects.create(user=user, user_profile=user_profile, vendor_name=f'{first_name} {last_name}')
 
-            messages.success(request, 'Your account has been registered sucessfully!')
+            messages.success(request, 'Your account has been registered successfully!')
             return redirect('login')
         else:
             print('invalid form')

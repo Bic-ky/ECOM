@@ -6,4 +6,4 @@ from vendor.models import Vendor
 @receiver(post_save, sender=User)
 def create_vendor(sender, instance, created, **kwargs):
     if created and instance.role == User.VENDOR:
-        Vendor.objects.create(user=instance)
+        Vendor.objects.create(user=instance, user_profile=instance.userprofile)

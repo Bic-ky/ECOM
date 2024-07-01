@@ -3,6 +3,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.related import ForeignKey, OneToOneField
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 # Create your models here.
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -98,6 +101,22 @@ class UserProfile(models.Model):
 
     def save(self, *args, **kwargs):
         return super(UserProfile, self).save(*args, **kwargs)
+
+
+@receiver(post_save , sender=User)
+def post_save_create_profile(sender , instance , created , **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+        print("Userprofile was created.")
+    else:
+        try:
+            profile = UserProfile.objects.get(user=instance)
+            print("Userprofile was updated.")
+            profile.save()
+        except:
+            UserProfile.objects.create(user=instance)
+            print("Userprofile was not found so created.")
+
 
 
 class VisitorCount(models.Model):
