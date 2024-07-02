@@ -206,6 +206,7 @@ def vendorDashboard(request):
     orders = Order.objects.filter( is_ordered=True)
     orders_count = orders.count()
     total_revenue = sum(order.total for order in orders)
+    total_revenue = round(total_revenue , 2)
 
     # Fetch active projects
     products = Product.objects.all()

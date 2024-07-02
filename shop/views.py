@@ -75,6 +75,9 @@ def get_cart_details(request):
         'product_quantities': product_quantities,
     })
 
+
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def cart(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
