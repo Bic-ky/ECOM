@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-_i762!miye$w9!+$1p(y$+7o_%$z#usysn+sd0t1h4-jx$sx$d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -95,9 +95,21 @@ DATABASES = {
         'NAME' : config('DB_NAME'),
         'USER' : config('DB_USER'),
         'PASSWORD':config('DB_PASSWORD'),
-        'HOST' : config('DB_HOST')
+        'HOST' : config('DB_HOST'),
+        'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DATABASE_NAME'),
+#         'USER': os.getenv('DATABASE_USER'),
+#         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+#         'HOST': os.getenv('DATABASE_HOST'),
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
