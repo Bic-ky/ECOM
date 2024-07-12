@@ -80,16 +80,10 @@ def place_order(request):
     return render(request, "orders/place_order.html")
 
 
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-
-@method_decorator(csrf_exempt, name='dispatch')
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def payments(request):
 
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if not check_role_customer(request.user):
-        raise PermissionDenied
     print(f"User: {request.user.username}")
     print(f"Is authenticated: {request.user.is_authenticated}")
     print(f"User role: {request.user.userprofile.role}")
