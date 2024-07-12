@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.sites.shortcuts import get_current_site
-
+from django.core.exceptions import PermissionDenied
 
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
@@ -80,9 +80,22 @@ def place_order(request):
     return render(request, "orders/place_order.html")
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_customer)
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+@method_decorator(csrf_exempt, name='dispatch')
 def payments(request):
+
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not check_role_customer(request.user):
+        raise PermissionDenied
+    print(f"User: {request.user.username}")
+    print(f"Is authenticated: {request.user.is_authenticated}")
+    print(f"User role: {request.user.userprofile.role}")
+    print(f"Passes check_role_customer: {check_role_customer(request.user)}")
+    print(f"Is AJAX request: {request.headers.get('x-requested-with') == 'XMLHttpRequest'}")
+    print(f"Request method: {request.method}")
         # Check if the request is ajax or not
     if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
         # STORE THE PAYMENT DETAILS IN THE PAYMENT MODEL
