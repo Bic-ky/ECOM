@@ -215,12 +215,12 @@ def vendorDashboard(request):
 
     # Get visitor count
     try:
-        visitor_counts = VisitorCount.objects.get()
+        visitor_counts = VisitorCount.objects.all()
     except VisitorCount.DoesNotExist:
         visitor_counts = None
 
     if visitor_counts:
-        visitor_count = visitor_counts.count
+        visitor_count = visitor_counts
     else:
         visitor_count = 0  # or handle the case when the visitor count does not exist
 

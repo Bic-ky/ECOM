@@ -105,6 +105,7 @@ class PlaceOrderViewTestCase(TestCase):
 
         if response.status_code == 200:
             print("PLACE ORDER SUCCESSFUL WITH STATUS CODE :" , response.status_code )
+            print(response)
         else:
             # Handle unexpected status codes
             print("Unexpected response status code:", response.status_code)
