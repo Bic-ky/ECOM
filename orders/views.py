@@ -18,6 +18,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def place_order(request):
+    if not request.user.is_authenticated:
+        print("User is not authenticated")
+        return redirect('login')
+    print("User is authenticated")
+
+
+    
     cart_items = Cart.objects.filter(user=request.user).order_by("created_at")
     cart_count = cart_items.count()
     if cart_count <= 0:
