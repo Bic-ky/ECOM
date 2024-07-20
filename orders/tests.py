@@ -87,8 +87,10 @@ class PlaceOrderViewTestCase(TestCase):
 
         # Check if the order object exists in the database
         orders = Order.objects.filter(user=self.user)
-        print("Orders for user:", orders)
+        print("\n-----------------------------------")
+        print("User :" , self.user)
         print("Total orders:", orders.count())
+        print("\n-----------------------------------")
 
         self.assertTrue(orders.exists())
 
